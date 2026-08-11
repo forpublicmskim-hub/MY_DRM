@@ -1,51 +1,51 @@
-# Initial DRM Lifecycle Architecture
+# 초기 DRM 라이프사이클 아키텍처
 
-## Summary
+## 요약
 
-Established the first production-oriented skeleton for a .NET 10 DRM lifecycle. The change defines explicit domain and runtime boundaries for opening, tracking, and closing protected-content sessions without claiming to provide production cryptography, license verification, tamper resistance, or kernel enforcement.
+.NET 10 기반 DRM 라이프사이클의 첫 번째 제품 지향 골격을 구축했다. 보호 콘텐츠 세션을 열고 추적하고 닫는 과정의 도메인 및 런타임 경계를 명확히 정의하되, 아직 제품 수준의 암호화, 라이선스 검증, 변조 방지 또는 커널 강제를 제공하는 것으로 간주하지 않는다.
 
-## Changes
+## 변경 사항
 
-- Added a layered solution composed of domain, application, infrastructure, managed-engine, host, and test projects.
-- Added typed domain models for authentication, principals, content, verified licenses, policy decisions, opaque handles, connectivity, and lifecycle states.
-- Implemented an ordered open pipeline that validates the environment, authenticates the caller, acquires a verified license, evaluates policy, and only then activates protected content.
-- Added `DrmSession` orchestration for opening and closing protected-content resources, plus `DrmApplication` as a concurrent session registry and lifetime owner.
-- Added replaceable application ports for environment validation, authentication, licensing, policy evaluation, protected-content activation, auditing, and time.
-- Added default infrastructure implementations for system time, deny-by-default license policy evaluation, and a no-op audit sink.
-- Added a development-only managed protected-content engine that returns opaque session handles and rejects license/content mismatches.
-- Drafted a versioned C ABI for native session open and close operations using fixed-width values, explicit buffer lengths, opaque handles, and no key material in the interface.
-- Added architecture documentation and focused tests for lifecycle transition rules and policy denial before engine activation.
+- 도메인, 애플리케이션, 인프라, 관리형 엔진, 호스트 및 테스트 프로젝트로 구성된 계층형 솔루션을 추가했다.
+- 인증 요청과 인증 주체, 콘텐츠, 검증된 라이선스, 정책 판단, 불투명 핸들, 연결 상태 및 라이프사이클 상태를 표현하는 형식화된 도메인 모델을 추가했다.
+- 환경 검증, 사용자 인증, 검증된 라이선스 획득, 정책 평가를 순서대로 수행한 후에만 보호 콘텐츠를 활성화하는 open pipeline을 구현했다.
+- 보호 콘텐츠 리소스의 열기와 닫기를 조정하는 `DrmSession`과 동시성 안전 세션 레지스트리 및 수명 소유자 역할을 하는 `DrmApplication`을 추가했다.
+- 환경 검증, 인증, 라이선스, 정책 평가, 보호 콘텐츠 활성화, 감사 및 시간 제공자를 교체할 수 있도록 애플리케이션 port를 정의했다.
+- 시스템 시간, 기본 거부 방식의 라이선스 정책 평가 및 no-op 감사 sink를 기본 인프라 구현으로 추가했다.
+- 불투명 세션 핸들을 반환하고 라이선스와 콘텐츠의 불일치를 거부하는 개발 전용 관리형 보호 콘텐츠 엔진을 추가했다.
+- 고정 폭 값, 명시적인 버퍼 길이, 불투명 핸들을 사용하고 키 데이터를 노출하지 않는 버전형 네이티브 세션 open/close C ABI 초안을 추가했다.
+- 라이프사이클 전이 규칙과 정책 거부 시 엔진이 활성화되지 않는 동작을 검증하는 테스트 및 아키텍처 문서를 추가했다.
 
-## Design
+## 설계
 
-The implementation separates policy and orchestration from protected-content mechanics. `Drm.Domain` owns immutable boundary types and the allowed state-transition table. `Drm.Application` coordinates work exclusively through interfaces, allowing production authentication, licensing, persistence, audit, and native-engine implementations to replace the initial adapters without changing the session API.
+정책과 오케스트레이션을 보호 콘텐츠 처리 방식에서 분리했다. `Drm.Domain`은 불변 경계 타입과 허용된 상태 전이 표를 소유한다. `Drm.Application`은 인터페이스만을 통해 작업을 조정하므로 세션 API를 변경하지 않고도 초기 adapter를 제품용 인증, 라이선스, 영속성, 감사 및 네이티브 엔진 구현으로 교체할 수 있다.
 
-The open path is intentionally ordered and fail-closed:
+open 경로는 다음 순서를 따르며 접근 허용 여부가 불명확할 때 거부하는 fail-closed 방식으로 동작한다.
 
 `AuthenticationRequest -> AuthenticatedPrincipal -> VerifiedLicense -> PolicyDecision -> IProtectedContentSession`
 
-A denied policy decision raises `DrmAccessDeniedException` before the protected-content engine is invoked. Audit and telemetry are observers and do not participate in access grants.
+정책이 접근을 거부하면 보호 콘텐츠 엔진을 호출하기 전에 `DrmAccessDeniedException`이 발생한다. 감사와 telemetry는 관찰자 역할만 하며 접근 권한 부여에 관여하지 않는다.
 
-`DrmSession` protects short state mutations with a semaphore but performs network, disk, and protected-content work outside that gate. A monotonically increasing operation generation and a lifetime cancellation token prevent a late open result from reactivating a session that has begun closing. Any stale protected-content result is disposed before cancellation is reported to the caller. Close detaches the protected resource under the gate, disposes it outside the gate, moves the session to `Closed`, records an audit event, and then surfaces cleanup failure.
+`DrmSession`은 semaphore로 짧은 상태 변경 구간을 보호하지만 네트워크, 디스크 및 보호 콘텐츠 작업은 gate 밖에서 수행한다. 단조 증가하는 작업 generation과 수명 cancellation token을 사용하여 닫기 시작한 세션이 늦게 완료된 open 결과로 다시 활성화되는 것을 방지한다. 유효하지 않게 된 보호 콘텐츠 결과는 호출자에게 취소를 알리기 전에 폐기한다. 닫기 작업은 gate 안에서 보호 리소스를 분리하고, gate 밖에서 리소스를 폐기한 다음 상태를 `Closed`로 전환하고 감사 이벤트를 기록한 후 정리 실패를 호출자에게 전달한다.
 
-The managed engine is only a development seam. The planned production boundary is a native implementation exposed through a stable C ABI and consumed through safe managed handles; raw key bytes are not part of the current boundary.
+관리형 엔진은 개발을 위한 교체 지점일 뿐이다. 제품 환경에서는 안정적인 C ABI로 노출되고 안전한 관리형 핸들을 통해 사용하는 네이티브 구현으로 교체할 예정이다. 현재 경계에는 원시 키 데이터가 포함되지 않는다.
 
-## Impact
+## 영향
 
-- Establishes maintainable extension points for future license verification, recovery, renewal, revocation, native enforcement, and service/driver communication.
-- Prevents invalid lifecycle transitions through an explicit allow-list and rejects content activation when policy denies access.
-- Provides concurrency protection against late asynchronous completion during session shutdown.
-- Keeps the host intentionally non-functional for playback until production adapters and composition are available.
-- Introduces no compatibility guarantee for the draft native ABI beyond its explicit version and structure-size fields.
-- Does not yet implement real cryptography, signed-license verification, durable recovery, tamper resistance, or kernel/minifilter enforcement.
+- 향후 라이선스 검증, 복구, 갱신, 해지, 네이티브 강제 및 서비스/드라이버 통신을 추가할 수 있는 유지보수 가능한 확장 지점을 제공한다.
+- 명시적인 허용 목록으로 잘못된 라이프사이클 전이를 막고, 정책이 접근을 거부하면 콘텐츠 활성화를 차단한다.
+- 세션 종료 중 늦게 완료되는 비동기 작업으로 인한 경쟁 조건을 방지한다.
+- 제품용 adapter와 composition이 준비될 때까지 호스트에서 재생 기능을 의도적으로 활성화하지 않는다.
+- 네이티브 ABI 초안은 명시된 버전 및 구조체 크기 필드 외에 호환성을 보장하지 않는다.
+- 실제 암호화, 서명된 라이선스 검증, 영속적 복구, 변조 방지 및 커널/minifilter 강제는 아직 구현하지 않았다.
 
-## Validation
+## 검증
 
-- `dotnet test Drm.slnx --no-restore` passes all 9 tests on .NET 10.
-- `OpenPipelineTests.DeniedPolicyNeverActivatesContent` verifies that policy denial throws and never calls the protected-content engine.
-- `SessionTransitionsTests` verifies representative allowed transitions and rejects unsafe transitions such as `Created -> Active`, `Closed -> Active`, and `Revoked -> Active`.
-- The solution enables nullable reference types, recommended analyzers, and warnings-as-errors for all projects.
+- `dotnet test Drm.slnx --no-restore`로 .NET 10 테스트 9개가 모두 통과했다.
+- `OpenPipelineTests.DeniedPolicyNeverActivatesContent`는 정책 거부 시 예외가 발생하고 보호 콘텐츠 엔진을 호출하지 않는지 검증한다.
+- `SessionTransitionsTests`는 대표적인 정상 전이를 허용하고 `Created -> Active`, `Closed -> Active`, `Revoked -> Active`와 같은 안전하지 않은 전이를 거부하는지 검증한다.
+- 모든 프로젝트에 nullable 참조 형식, 권장 analyzer 및 warnings-as-errors 설정을 적용했다.
 
-## Related
+## 관련 문서
 
-- [Architecture overview](../../docs/architecture.md)
+- [아키텍처 개요](../../docs/architecture.md)

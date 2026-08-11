@@ -1,12 +1,16 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Drm.Application/Drm.Application.csproj" />
+    <Project Path="src/Drm.Desktop/Drm.Desktop.csproj" />
     <Project Path="src/Drm.Domain/Drm.Domain.csproj" />
     <Project Path="src/Drm.Host/Drm.Host.csproj" />
     <Project Path="src/Drm.Infrastructure/Drm.Infrastructure.csproj" />
     <Project Path="src/Drm.ManagedEngine/Drm.ManagedEngine.csproj" />
+    <Project Path="src/Drm.Platform.Abstractions/Drm.Platform.Abstractions.csproj" />
+    <Project Path="src/Drm.Platform.Local/Drm.Platform.Local.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Drm.Application.Tests/Drm.Application.Tests.csproj" />
+    <Project Path="tests/Drm.Workspaces.Tests/Drm.Workspaces.Tests.csproj" />
   </Folder>
 </Solution>

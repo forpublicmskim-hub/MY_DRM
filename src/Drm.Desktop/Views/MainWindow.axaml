@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Drm.Desktop.ViewModels"
+        x:Class="Drm.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Width="920" Height="600" MinWidth="720" MinHeight="460"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="DRM 작업공간">
+  <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="28" RowSpacing="16">
+    <StackPanel Grid.Row="0" Spacing="6">
+      <TextBlock FontSize="28" FontWeight="SemiBold" Text="보호 작업공간" />
+      <TextBlock Foreground="Gray"
+                 Text="보호 대상으로 폴더를 등록합니다. 이 단계에서는 파일을 암호화하거나 변경하지 않습니다." />
+    </StackPanel>
+
+    <Border Grid.Row="1" BorderBrush="#60656D" BorderThickness="1" CornerRadius="8">
+      <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:WorkspaceItemViewModel">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="14,10">
+              <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
+              <Border Grid.Row="0" Grid.Column="1" Padding="10,3" CornerRadius="10" Background="#263B58">
+                <TextBlock Text="{Binding Status}" />
+              </Border>
+              <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="#D18A30"
+                         Text="{Binding ProtectionNotice}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
+      <Button Command="{Binding AddFolderCommand}" Content="폴더 추가" />
+      <Button Command="{Binding UnregisterCommand}" Content="등록 해제" />
+      <Button Command="{Binding OpenPathCommand}" Content="폴더 위치 보기" />
+      <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding ActivityMessage}" />
+    </StackPanel>
+
+    <Border Grid.Row="3" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+            Background="#4A2525" CornerRadius="6" Padding="12">
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+    </Border>
+  </Grid>
+</Window>

@@ -1,30 +1,54 @@
-# DRM architecture skeleton
+# DRM 아키텍처 뼈대
 
-## Runtime boundaries
+## 현재 범위
 
-`DrmApplication` owns multiple `DrmSession` instances. Each session serializes short state changes, while network, disk, and cryptographic work happens outside its state gate. An operation generation prevents late asynchronous completion from reviving a closing session.
+이 저장소는 운영 환경을 고려한 DRM 생명주기의 기본 구조를 정의한다. 현재 단계의 목적은 책임과 보안 경계를 명확히 나누고 안전한 세션 오케스트레이션의 기반을 마련하는 것이다.
 
-The open flow is deliberately typed:
+아직 실제 암호화, 라이선스 서명 검증, 장치 바인딩, 변조 방지, 커널 수준 강제 적용은 제공하지 않는다. 따라서 현재 구현만으로 보호 콘텐츠를 운영 환경에서 안전하게 제공할 수 있다고 간주해서는 안 된다.
 
-`AuthenticationRequest -> AuthenticatedPrincipal -> VerifiedLicense -> IProtectedContentSession`
+## 런타임 경계
 
-Policy evaluation is a direct, fail-closed call before content activation. Audit/UI/telemetry integrations are observers and must never grant access.
+`DrmApplication`은 여러 `DrmSession` 인스턴스를 소유하고 관리한다. 각 세션은 짧은 상태 변경만 직렬화하며, 네트워크·디스크·암호 연산처럼 오래 걸릴 수 있는 작업은 상태 잠금 밖에서 수행한다.
 
-## Projects
+세션은 작업 세대 번호(operation generation)를 사용한다. 이 값은 이전 비동기 작업이 늦게 완료되더라도 이미 닫히고 있거나 상태가 변경된 세션을 다시 활성화하지 못하게 한다.
 
-- `Drm.Domain`: states, transition table, policies, opaque handles, immutable boundary types.
-- `Drm.Application`: session orchestration, typed open pipeline, ports, application session registry.
-- `Drm.Infrastructure`: replaceable policy, clock, audit, persistence, server and recovery adapters.
-- `Drm.ManagedEngine`: development-only protected-content engine.
-- `Drm.Host`: future Windows service composition root. It intentionally does not enable playback yet.
-- `native/include`: versioned C ABI draft. No exceptions, STL types, or key bytes cross the ABI.
+콘텐츠 열기 흐름은 단계별 입력과 출력을 구체적인 타입으로 표현한다.
 
-## Next increments
+```text
+AuthenticationRequest
+  -> AuthenticatedPrincipal
+  -> VerifiedLicense
+  -> IProtectedContentSession
+```
 
-1. Define the signed license envelope and threat model, then implement signature/device-binding verification.
-2. Add durable operation records and startup reconciliation with idempotency keys.
-3. Implement renew, suspend/resume, revoke and heartbeat commands as separate pipelines.
-4. Add a native user-mode core and `SafeHandle`-based C# adapter.
-5. Add an authenticated, versioned service-to-driver protocol before implementing the minifilter.
+정책 평가는 보호 콘텐츠를 활성화하기 전에 직접 호출하며, 실패하거나 명확한 허용 결과를 얻지 못하면 접근을 거부하는 fail-closed 방식을 따른다. 감사 로그, UI, telemetry는 결과를 관찰하는 역할만 담당하며 콘텐츠 접근 권한을 부여해서는 안 된다.
 
-The minifilter is intentionally deferred: driver policy should remain minimal, and its protocol depends on the threat model and native service boundary.
+## 프로젝트 구성
+
+- `Drm.Domain`: 세션 및 연결 상태, 상태 전이표, 정책 모델, opaque handle, 불변 경계 타입을 정의한다.
+- `Drm.Application`: 세션 생명주기, 타입 기반 콘텐츠 열기 파이프라인, 외부 연동 port, 애플리케이션 세션 레지스트리를 관리한다.
+- `Drm.Infrastructure`: 정책, 시간, 감사 로그, 영속성, 라이선스 서버 및 복구 기능의 교체 가능한 adapter를 제공한다.
+- `Drm.ManagedEngine`: 개발과 테스트에만 사용하는 보호 콘텐츠 엔진 구현을 제공한다. 운영 환경의 보안 엔진으로 사용해서는 안 된다.
+- `Drm.Host`: 향후 Windows 서비스의 composition root 역할을 담당한다. 현재는 의도적으로 실제 콘텐츠 재생이나 사용을 활성화하지 않는다.
+- `native/include`: 버전이 지정된 C ABI 초안을 정의한다. 예외, STL 타입 및 원본 키 바이트는 ABI 경계를 넘어가지 않는다.
+- `tests/Drm.Application.Tests`: 상태 전이와 애플리케이션 파이프라인의 보안 동작을 검증한다.
+
+## 핵심 설계 원칙
+
+1. DRM 상태는 UI나 외부 호출자가 직접 변경하지 않고 `DrmSession`의 허용된 전이를 통해서만 변경한다.
+2. 콘텐츠 활성화는 환경 검증, 인증, 라이선스 획득 및 정책 평가가 모두 성공한 뒤에만 수행한다.
+3. 키와 보호 리소스는 가능한 한 원본 값 대신 opaque handle로 전달한다.
+4. 종료, 취소 및 늦게 완료된 비동기 작업에서도 보호 리소스를 확실하게 폐기한다.
+5. UI와 telemetry 실패가 접근 허용으로 이어지지 않도록 보안 결정 경로와 부수 효과를 분리한다.
+6. 외부 요청은 멱등성과 재시작 복구를 고려하며, 부분 성공 상태를 명시적으로 조정할 수 있어야 한다.
+
+## 향후 구현 단계
+
+1. 서명된 라이선스 envelope와 위협 모델을 정의하고 서명 및 장치 바인딩 검증을 구현한다.
+2. 멱등성 키를 사용하는 영속적 작업 기록과 시작 시 reconciliation을 추가한다.
+3. 갱신, 일시 중지·재개, 철회 및 heartbeat 명령을 각각 독립된 파이프라인으로 구현한다.
+4. 네이티브 user-mode core와 `SafeHandle` 기반 C# adapter를 추가한다.
+5. minifilter를 구현하기 전에 인증되고 버전이 지정된 서비스-드라이버 프로토콜을 정의한다.
+6. 사용자 UI를 별도 프로세스로 구성하고 인증된 IPC를 통해 DRM 서비스에 명령을 전달한다.
+
+minifilter 구현은 의도적으로 뒤로 미룬다. 드라이버의 정책 로직은 최소화해야 하며, 서비스-드라이버 프로토콜은 위협 모델과 네이티브 서비스 경계가 먼저 확정되어야 설계할 수 있다.

@@ -17,6 +17,48 @@
 - 개발 및 테스트 전용 managed 보호 콘텐츠 엔진을 제공합니다.
 - 향후 네이티브 모듈 연동을 위한 버전 지정 C ABI 초안을 정의했습니다.
 
+이 프로젝트는 기능 호출을 단순히 나열하는 방식이 아니라, DRM 세션이 생성되어 보호 콘텐츠를 활성화하고 최종적으로 리소스를 정리할 때까지의 전체 라이프사이클을 명시적으로 관리하는 구조를 기반으로 합니다.
+
+```text
+정상 라이프사이클
+
+Created -> Opening -> Active <-> Suspended
+   |          |          |          |
+   +----------+----------+----------+
+                         |
+                         v
+                      Closing -> Closed
+
+예외 및 보안 상태
+
+Opening -----> Faulted ----+
+   |                       |
+   +---------> Revoked ----+----> Closing -> Closed
+
+Active  ----> Faulted -----+
+   |                       |
+   +---------> Revoked ----+
+
+Suspended --> Faulted -----+
+   |                       |
+   +---------> Revoked ----+
+```
+
+보호 콘텐츠를 활성화하는 open pipeline도 라이프사이클의 일부로 관리합니다. 각 단계가 성공해야만 다음 단계로 이동하며, 정책이 명시적으로 허용하지 않으면 콘텐츠 엔진을 호출하지 않는 fail-closed 방식을 적용합니다.
+
+```text
+OpenSessionRequest
+  -> Environment Validation
+  -> AuthenticationRequest
+  -> AuthenticatedPrincipal
+  -> VerifiedLicense
+  -> PolicyDecision
+       |-- Denied  -> DrmAccessDeniedException
+       `-- Allowed -> IProtectedContentSession -> Active
+```
+
+세션을 닫기 시작하면 generation과 cancellation token을 갱신합니다. 따라서 이전 open 작업이 늦게 완료되더라도 `Active` 상태로 되돌아갈 수 없으며, 늦게 생성된 보호 콘텐츠 리소스는 폐기합니다.
+
 ### 작업공간 등록
 
 - Avalonia 기반 Desktop 관리 화면을 제공합니다.

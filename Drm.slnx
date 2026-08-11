@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Drm.Application/Drm.Application.csproj" />
+    <Project Path="src/Drm.Domain/Drm.Domain.csproj" />
+    <Project Path="src/Drm.Host/Drm.Host.csproj" />
+    <Project Path="src/Drm.Infrastructure/Drm.Infrastructure.csproj" />
+    <Project Path="src/Drm.ManagedEngine/Drm.ManagedEngine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Drm.Application.Tests/Drm.Application.Tests.csproj" />
+  </Folder>
+</Solution>

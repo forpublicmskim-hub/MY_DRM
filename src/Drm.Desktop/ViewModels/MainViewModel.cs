@@ -13,8 +13,7 @@ public sealed partial class MainViewModel(
     WorkspaceService workspaces,
     IFolderPicker folderPicker,
     IWorkspacePathLauncher pathLauncher,
-    ILocalizationService localization,
-    WorkspaceErrorLocalizer workspaceErrors) : ViewModelBase, IAsyncDisposable
+    ILocalizationService localization) : ViewModelBase, IAsyncDisposable
 {
     private readonly CancellationTokenSource _lifetime = new();
 
@@ -79,7 +78,11 @@ public sealed partial class MainViewModel(
         try
         {
             WorkspaceRegistrationResult result = await workspaces.RegisterAsync(path, _lifetime.Token);
-            if (!result.IsSuccess) { ErrorMessage = workspaceErrors.GetMessage(result.Validation.Code); return; }
+            if (!result.IsSuccess)
+            {
+                ErrorMessage = localization.GetString(WorkspaceMessageKeys.ForValidation(result.Validation.Code));
+                return;
+            }
             await ReloadAsync(_lifetime.Token);
             SelectedItem = Items.FirstOrDefault(item => item.Id == result.Workspace!.Id);
         }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="App.Title" xml:space="preserve"><value>DRM 작업공간</value></data>
+  <data name="Language.English" xml:space="preserve"><value>영어</value></data>
+  <data name="Language.Korean" xml:space="preserve"><value>한국어</value></data>
+  <data name="Workspace.Title" xml:space="preserve"><value>보호 작업공간</value></data>
+  <data name="Workspace.Description" xml:space="preserve"><value>보호 대상으로 폴더를 등록합니다. 이 단계에서는 파일을 암호화하거나 변경하지 않습니다.</value></data>
+  <data name="Workspace.Add" xml:space="preserve"><value>폴더 추가</value></data>
+  <data name="Workspace.Unregister" xml:space="preserve"><value>등록 해제</value></data>
+  <data name="Workspace.OpenLocation" xml:space="preserve"><value>폴더 위치 보기</value></data>
+  <data name="Workspace.Picker.Title" xml:space="preserve"><value>보호 대상으로 등록할 폴더 선택</value></data>
+  <data name="Workspace.Status.Registered" xml:space="preserve"><value>등록됨</value></data>
+  <data name="Workspace.Status.Unavailable" xml:space="preserve"><value>접근 불가</value></data>
+  <data name="Workspace.Protection.NotActivated" xml:space="preserve"><value>파일 보호 기능은 아직 활성화되지 않았습니다.</value></data>
+  <data name="Workspace.Protection.CheckStatus" xml:space="preserve"><value>파일 보호 상태를 확인해 주세요.</value></data>
+  <data name="Workspace.Activity.Loading" xml:space="preserve"><value>목록을 불러오는 중...</value></data>
+  <data name="Workspace.Activity.Registering" xml:space="preserve"><value>폴더를 등록하는 중...</value></data>
+  <data name="Workspace.Activity.Unregistering" xml:space="preserve"><value>등록을 해제하는 중...</value></data>
+  <data name="Workspace.Picker.Unavailable" xml:space="preserve"><value>이 플랫폼에서는 폴더 선택 창을 사용할 수 없습니다.</value></data>
+  <data name="Workspace.Load.Corrupted" xml:space="preserve"><value>작업공간 설정이 손상되었습니다. 설정 파일을 확인해 주세요.</value></data>
+  <data name="Workspace.Load.Failed" xml:space="preserve"><value>작업공간 목록을 불러오지 못했습니다.</value></data>
+  <data name="Workspace.Unregister.NotFound" xml:space="preserve"><value>이미 등록 해제되었거나 찾을 수 없는 작업공간입니다.</value></data>
+  <data name="Workspace.Unregister.SaveFailed" xml:space="preserve"><value>등록 해제 내용을 저장하지 못했습니다. 폴더와 파일은 변경되지 않았습니다.</value></data>
+  <data name="Workspace.Open.Failed" xml:space="preserve"><value>등록된 폴더를 열 수 없습니다.</value></data>
+  <data name="Workspace.Validation.Allowed" xml:space="preserve"><value>등록할 수 있습니다.</value></data>
+  <data name="Workspace.Validation.InvalidPath" xml:space="preserve"><value>올바른 로컬 폴더 경로가 아닙니다.</value></data>
+  <data name="Workspace.Validation.DoesNotExist" xml:space="preserve"><value>선택한 폴더가 존재하지 않습니다.</value></data>
+  <data name="Workspace.Validation.NotDirectory" xml:space="preserve"><value>선택한 위치는 폴더가 아닙니다.</value></data>
+  <data name="Workspace.Validation.AccessDenied" xml:space="preserve"><value>선택한 폴더에 필요한 읽기·쓰기 권한이 없습니다.</value></data>
+  <data name="Workspace.Validation.FileSystemRootNotAllowed" xml:space="preserve"><value>파일 시스템 루트는 등록할 수 없습니다.</value></data>
+  <data name="Workspace.Validation.SystemLocationNotAllowed" xml:space="preserve"><value>운영체제 또는 프로그램 폴더는 등록할 수 없습니다.</value></data>
+  <data name="Workspace.Validation.ApplicationLocationNotAllowed" xml:space="preserve"><value>애플리케이션 또는 설정 폴더는 등록할 수 없습니다.</value></data>
+  <data name="Workspace.Validation.TemporaryLocationNotAllowed" xml:space="preserve"><value>임시 폴더는 등록할 수 없습니다.</value></data>
+  <data name="Workspace.Policy.Duplicate" xml:space="preserve"><value>이미 등록된 폴더입니다.</value></data>
+  <data name="Workspace.Policy.ExistingContainsCandidate" xml:space="preserve"><value>이미 등록된 작업공간의 하위 폴더는 등록할 수 없습니다.</value></data>
+  <data name="Workspace.Policy.CandidateContainsExisting" xml:space="preserve"><value>기존 작업공간을 포함하는 상위 폴더는 등록할 수 없습니다.</value></data>
+  <data name="Workspace.Validation.SymbolicLinkNotSupported" xml:space="preserve"><value>심볼릭 링크 또는 reparse point는 지원하지 않습니다.</value></data>
+  <data name="Workspace.Validation.NetworkLocationNotSupported" xml:space="preserve"><value>네트워크 폴더는 현재 지원하지 않습니다.</value></data>
+  <data name="Workspace.Validation.RemovableLocationNotSupported" xml:space="preserve"><value>이동식 저장장치는 현재 지원하지 않습니다.</value></data>
+  <data name="Workspace.Validation.CloudLocationNotSupported" xml:space="preserve"><value>클라우드 동기화 폴더는 현재 지원하지 않습니다.</value></data>
+  <data name="Workspace.Validation.UnsupportedFileSystem" xml:space="preserve"><value>지원하지 않는 저장장치 또는 파일 시스템입니다.</value></data>
+  <data name="Workspace.Storage.SaveFailed" xml:space="preserve"><value>작업공간 설정을 저장하지 못했습니다. 다시 시도해 주세요.</value></data>
+  <data name="Workspace.Storage.Corrupted" xml:space="preserve"><value>작업공간 설정이 손상되어 등록할 수 없습니다.</value></data>
+  <data name="Common.UnexpectedError" xml:space="preserve"><value>예상하지 못한 오류가 발생했습니다.</value></data>
+</root>

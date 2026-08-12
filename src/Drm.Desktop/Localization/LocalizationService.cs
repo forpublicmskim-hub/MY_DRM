@@ -7,6 +7,8 @@ namespace Drm.Desktop.Localization;
 public interface ILocalizationService
 {
     string GetString(string key);
+    string GetStringForCulture(string key, CultureInfo culture);
+    string Format(string key, params object?[] arguments);
 }
 
 public sealed class LocalizationService : ILocalizationService
@@ -15,19 +17,29 @@ public sealed class LocalizationService : ILocalizationService
     private static readonly ResourceManager Resources = new(
         "Drm.Desktop.Localization.Strings", typeof(LocalizationService).Assembly);
 
-    public string GetString(string key) =>
-        Resources.GetString(key, CultureInfo.CurrentUICulture)
-        ?? Resources.GetString(FallbackKey, CultureInfo.CurrentUICulture)
-        ?? "Unexpected error.";
+    public string GetString(string key) => GetStringForCulture(key, CultureInfo.CurrentUICulture);
 
-    public static bool ContainsResource(string key) => Resources.GetString(key, CultureInfo.CurrentUICulture) is not null;
+    public string GetStringForCulture(string key, CultureInfo culture)
+    {
+        ArgumentNullException.ThrowIfNull(culture);
+        return Resources.GetString(key, culture)
+            ?? Resources.GetString(FallbackKey, culture)
+            ?? "An unexpected error occurred.";
+    }
+
+    public string Format(string key, params object?[] arguments) =>
+        FormatForCulture(key, CultureInfo.CurrentUICulture, arguments);
+
+    public string FormatForCulture(string key, CultureInfo culture, params object?[] arguments)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+        return string.Format(culture, GetStringForCulture(key, culture), arguments);
+    }
 }
 
-public sealed class WorkspaceErrorLocalizer(ILocalizationService localization)
+public static class WorkspaceMessageKeys
 {
-    public string GetMessage(WorkspaceValidationCode code) => localization.GetString(GetResourceKey(code));
-
-    public static string GetResourceKey(WorkspaceValidationCode code) => code switch
+    public static string ForValidation(WorkspaceValidationCode code) => code switch
     {
         WorkspaceValidationCode.Allowed => "Workspace.Validation.Allowed",
         WorkspaceValidationCode.InvalidPath => "Workspace.Validation.InvalidPath",

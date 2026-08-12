@@ -54,7 +54,7 @@
 
 오류 enum 이름과 리소스 키를 직접 결합하지 않는다. `Workspace.Validation`, `Workspace.Policy`, `Workspace.Storage` 영역을 포함한 의미 기반 키를 사용하므로 코드 식별자 변경이나 화면별 문구 확장 시 번역 키를 독립적으로 유지할 수 있다.
 
-이번 변경은 국제화 기반에만 한정한다. `en-US`, 언어 선택 UI, 사용자 preferences, 시작 전 culture 선택 및 즉시 전환은 포함하지 않는다.
+이 단계에서는 국제화 기반만 구성했으며, 영어 fallback과 지원 culture 카탈로그는 후속 변경에서 추가했다. 사용자 언어 선택 UI, 사용자 preferences, 시작 전 preference 적용 및 즉시 전환은 아직 포함하지 않는다.
 
 ### 검증
 
@@ -62,3 +62,30 @@
 - 알 수 없는 오류 코드 fallback, 리소스 중복·빈 값, 한국어 기준 문자열, 사용자 결과의 문장 비저장과 관련 파일의 엄격한 UTF-8 decoding을 검증했다.
 - Avalonia application XAML 리소스가 실제로 로드되는지 검증했다.
 - 전체 빌드는 경고 0개, 오류 0개로 통과했고 기존 테스트 9개와 Workspace 테스트 21개가 모두 통과했다.
+
+## 지원 culture 카탈로그와 영어 fallback
+
+### 변경 사항
+
+- 정상 한국어 값이 들어 있던 중립 `Strings.resx`를 영어 fallback과 기준 키 계약으로 전환하고, 동일한 키 집합의 `Strings.ko-KR.resx`를 추가했다.
+- 번역자가 등록 해제와 보호 미활성의 의미를 혼동하지 않도록 영어 기준 리소스에 문맥 comment를 추가했다.
+- `LocalizationService`에 명시적 culture 조회와 format 기능을 추가했다. 운영 호출은 시작 시 고정되는 `CurrentUICulture`를 유지하고, 테스트와 리소스 검증은 전역 culture 변경 없이 culture를 명시한다.
+- `SupportedUiCultures`에 `en-US`, `ko-KR`와 영어 기본값을 중앙화했다.
+- `UiCultureResolver`를 순수 정책으로 추가해 명시적 선택, 시스템 exact match, 언어 수준 match, 영어 fallback을 처리한다.
+- 인스턴스형 `WorkspaceErrorLocalizer`를 정적 `WorkspaceMessageKeys`로 단순화해 오류 코드에서 안정적인 리소스 키로의 mapping만 담당하게 했다.
+
+### 설계
+
+중립 영어 리소스의 키 집합을 번역 계약으로 취급한다. 지원 culture는 중립 리소스와 정확히 같은 키를 제공해야 하며 fallback이 개발 중 누락을 가리지 못하도록 `.resx` XML을 직접 비교한다. 새 culture는 리소스 파일 추가, 정적 카탈로그 등록, 자동 검증, 실제 UI 레이아웃 확인의 순서로 도입한다.
+
+실행 중 culture 변경 요구가 없으므로 `IUiCultureProvider`나 변경 이벤트는 도입하지 않았다. 사용자 preference 저장과 언어 선택 UI도 이번 변경에서 제외했다.
+
+### 검증
+
+- 영어·한국어 리소스의 키 집합 일치, 빈 값·중복·고아 키 부재와 UTF-8/XML 유효성을 검증했다.
+- 모든 `WorkspaceValidationCode` mapping 키가 두 culture에 존재하는지 검증했다.
+- 영어·한국어 명시 조회, culture별 일반 오류 fallback과 format 동작을 검증했다.
+- format placeholder 번호 집합 일치와 각 culture의 실제 `string.Format` 성공을 검증했다.
+- 지원 culture 카탈로그와 실제 culture 파일의 일치, resolver의 explicit/exact/language/default 경로를 검증했다.
+- 영어 중립 fallback이 assembly metadata에도 `NeutralResourcesLanguage("en-US")`로 선언됐는지 검증했다.
+- 전체 빌드는 경고 0개, 오류 0개로 통과했고 기존 테스트 9개와 Workspace 테스트 32개가 모두 통과했다.

@@ -33,7 +33,7 @@ public partial class App : Avalonia.Application
                 new WorkspaceRegistrationPolicy(locations), new SystemClock());
             window.DataContext = new MainViewModel(workspaceService,
                 new AvaloniaFolderPicker(() => window, localization), new LocalWorkspacePathLauncher(),
-                localization, new WorkspaceErrorLocalizer(localization));
+                localization);
             desktop.MainWindow = window;
         }
 

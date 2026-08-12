@@ -111,7 +111,7 @@ public sealed class WorkspaceServiceTests
             cancellationToken.ThrowIfCancellationRequested();
             if (failureCode is { } code)
                 return ValueTask.FromResult(new WorkspaceLocationResolution(null,
-                    WorkspaceValidationResult.Denied(code, "등록할 수 없습니다.")));
+                    WorkspaceValidationResult.Denied(code)));
             string canonical = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
             return ValueTask.FromResult(new WorkspaceLocationResolution(
                 new WorkspaceLocation(canonical, canonical), WorkspaceValidationResult.Allowed()));

@@ -26,3 +26,17 @@
 현재 `CanonicalPath`는 중복·중첩 판정에 사용되지만 신뢰 가능한 영구 파일 시스템 식별자는 아니다. 폴더 이동, mount 변경 또는 검증 직후 위치 교체를 완전히 방어하지 못한다. 실제 암호화나 접근 통제를 수행하기 직전에는 위치를 다시 검증하고, 플랫폼별 `PlatformIdentity`와 지속 접근 참조를 구현해야 한다.
 
 Registry는 비밀번호, 토큰 또는 키를 저장하지 않는다. 다중 프로세스 동시 쓰기와 서비스 소유 Registry는 다음 마일스톤 범위다.
+
+## 사용자 문자열과 오류 코드
+
+사용자 표시 문자열은 `Drm.Desktop/Localization`에서 관리한다. `Strings.resx`는 영어 중립 리소스이자 전체 키 계약이며, `Strings.ko-KR.resx`는 동일한 계약의 한국어 번역이다. 번역 키가 culture 리소스에 누락되면 영어 중립 리소스로 fallback한다. XAML, ViewModel과 Folder Picker는 `ILocalizationService`를 통해 문자열을 얻으며, Domain·Application·Platform 계층은 현재 UI culture나 번역 문구를 알지 않는다.
+
+`WorkspaceValidationResult`는 `IsAllowed`와 `WorkspaceValidationCode`만 반환한다. 정적 `WorkspaceMessageKeys`가 명시적인 switch mapping으로 오류 코드를 의미 기반 리소스 키에 연결한다. enum 이름을 리소스 키로 직접 사용하지 않으며, 알 수 없는 코드는 `Common.UnexpectedError`로 fallback한다.
+
+Registry와 파일 시스템 adapter의 예외 메시지는 사용자에게 직접 표시하지 않는 내부 진단 정보다. Desktop은 예외 형식 또는 오류 코드를 번역 가능한 일반 문구로 변환한다. 경로와 원본 OS 오류 같은 민감한 진단 정보는 현재 원격 telemetry로 전송하지 않는다.
+
+`SupportedUiCultures`는 릴리스 지원 culture를 `en-US`, `ko-KR`로 중앙 관리하며 기본값은 `en-US`다. `UiCultureResolver`는 명시적 지원 culture, 시스템 culture exact match, 언어 수준 match, 영어 기본값 순서로 culture를 결정하는 순수 정책이다. `LocalizationService`는 실행 중에는 `CurrentUICulture`를 사용하고 테스트 및 검증에는 명시적 culture 조회와 format API를 제공한다.
+
+새 언어를 추가할 때는 `Strings.{culture}.resx`를 추가하고 `SupportedUiCultures`에 등록한 다음 완전성 테스트를 통과시켜야 한다. 모든 지원 culture 파일은 영어 중립 리소스와 키 집합이 정확히 같아야 하며 빈 값, 고아 키와 format placeholder 불일치를 허용하지 않는다.
+
+사용자 언어 설정, `settings.json`, 앱 시작 전 culture 적용, 언어 선택 UI와 실행 중 culture 변경은 아직 구현하지 않았다. 현재 지원 범위는 LTR 언어이며 RTL UI는 별도 검증 전까지 지원으로 간주하지 않는다.

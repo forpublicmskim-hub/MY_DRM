@@ -52,52 +52,52 @@ public sealed class LocalWorkspaceLocationResolver : IWorkspaceLocationResolver
     public ValueTask<WorkspaceLocationResolution> ResolveAsync(string path, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (string.IsNullOrWhiteSpace(path)) return Denied(WorkspaceValidationCode.InvalidPath, "폴더 경로가 비어 있습니다.");
+        if (string.IsNullOrWhiteSpace(path)) return Denied(WorkspaceValidationCode.InvalidPath);
 
         string canonical;
         try { canonical = NormalizeUnchecked(path); }
         catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
         {
-            return Denied(WorkspaceValidationCode.InvalidPath, "올바른 로컬 폴더 경로가 아닙니다.");
+            return Denied(WorkspaceValidationCode.InvalidPath);
         }
 
         if (!Directory.Exists(canonical))
             return File.Exists(canonical)
-                ? Denied(WorkspaceValidationCode.NotDirectory, "선택한 위치는 폴더가 아닙니다.")
-                : Denied(WorkspaceValidationCode.DoesNotExist, "선택한 폴더가 존재하지 않습니다.");
+                ? Denied(WorkspaceValidationCode.NotDirectory)
+                : Denied(WorkspaceValidationCode.DoesNotExist);
 
         string? root = Path.GetPathRoot(canonical);
         if (root is not null && string.Equals(NormalizeUnchecked(root), canonical, _comparison))
-            return Denied(WorkspaceValidationCode.FileSystemRootNotAllowed, "파일 시스템 루트는 등록할 수 없습니다.");
+            return Denied(WorkspaceValidationCode.FileSystemRootNotAllowed);
 
         if (OperatingSystem.IsWindows() && canonical.Length >= 2 && canonical[0] == '\\' && canonical[1] == '\\')
-            return Denied(WorkspaceValidationCode.NetworkLocationNotSupported, "네트워크 폴더는 현재 지원하지 않습니다.");
+            return Denied(WorkspaceValidationCode.NetworkLocationNotSupported);
 
         try
         {
             FileAttributes attributes = File.GetAttributes(canonical);
             if ((attributes & FileAttributes.ReparsePoint) != 0)
-                return Denied(WorkspaceValidationCode.SymbolicLinkNotSupported, "심볼릭 링크 또는 reparse point는 지원하지 않습니다.");
+                return Denied(WorkspaceValidationCode.SymbolicLinkNotSupported);
 
             if (root is not null)
             {
                 DriveType driveType = new DriveInfo(root).DriveType;
                 if (driveType == DriveType.Network)
-                    return Denied(WorkspaceValidationCode.NetworkLocationNotSupported, "네트워크 폴더는 현재 지원하지 않습니다.");
+                    return Denied(WorkspaceValidationCode.NetworkLocationNotSupported);
                 if (driveType == DriveType.Removable)
-                    return Denied(WorkspaceValidationCode.RemovableLocationNotSupported, "이동식 저장장치는 현재 지원하지 않습니다.");
+                    return Denied(WorkspaceValidationCode.RemovableLocationNotSupported);
                 if (driveType != DriveType.Fixed)
-                    return Denied(WorkspaceValidationCode.UnsupportedFileSystem, "지원하지 않는 저장장치입니다.");
+                    return Denied(WorkspaceValidationCode.UnsupportedFileSystem);
             }
 
             if (IsSameOrAncestor(_temporaryLocation, canonical))
-                return Denied(WorkspaceValidationCode.TemporaryLocationNotAllowed, "임시 폴더는 등록할 수 없습니다.");
+                return Denied(WorkspaceValidationCode.TemporaryLocationNotAllowed);
             if (_cloudLocations.Any(cloud => IsSameOrAncestor(cloud, canonical)))
-                return Denied(WorkspaceValidationCode.CloudLocationNotSupported, "클라우드 동기화 폴더는 현재 지원하지 않습니다.");
+                return Denied(WorkspaceValidationCode.CloudLocationNotSupported);
             if (_systemLocations.Any(forbidden => IsSameOrAncestor(forbidden, canonical)))
-                return Denied(WorkspaceValidationCode.SystemLocationNotAllowed, "운영체제 또는 프로그램 폴더는 등록할 수 없습니다.");
+                return Denied(WorkspaceValidationCode.SystemLocationNotAllowed);
             if (_applicationLocations.Any(forbidden => IsSameOrAncestor(forbidden, canonical)))
-                return Denied(WorkspaceValidationCode.ApplicationLocationNotAllowed, "애플리케이션 또는 설정·임시 폴더는 등록할 수 없습니다.");
+                return Denied(WorkspaceValidationCode.ApplicationLocationNotAllowed);
 
             _ = Directory.EnumerateFileSystemEntries(canonical).Take(1).ToArray();
             string probePath = Path.Combine(canonical, $".drm-write-probe-{Guid.NewGuid():N}.tmp");
@@ -106,7 +106,7 @@ public sealed class LocalWorkspaceLocationResolver : IWorkspaceLocationResolver
         }
         catch (Exception exception) when (exception is UnauthorizedAccessException or IOException)
         {
-            return Denied(WorkspaceValidationCode.AccessDenied, "선택한 폴더에 필요한 읽기·쓰기 권한이 없습니다.");
+            return Denied(WorkspaceValidationCode.AccessDenied);
         }
 
         WorkspaceLocation location = new(canonical, canonical);
@@ -131,8 +131,8 @@ public sealed class LocalWorkspaceLocationResolver : IWorkspaceLocationResolver
 
     private static StringComparer GetComparer() => OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
-    private static ValueTask<WorkspaceLocationResolution> Denied(WorkspaceValidationCode code, string message) =>
-        ValueTask.FromResult(new WorkspaceLocationResolution(null, WorkspaceValidationResult.Denied(code, message)));
+    private static ValueTask<WorkspaceLocationResolution> Denied(WorkspaceValidationCode code) =>
+        ValueTask.FromResult(new WorkspaceLocationResolution(null, WorkspaceValidationResult.Denied(code)));
 }
 
 public sealed class LocalWorkspacePathLauncher : IWorkspacePathLauncher
@@ -140,7 +140,8 @@ public sealed class LocalWorkspacePathLauncher : IWorkspacePathLauncher
     public ValueTask OpenAsync(WorkspaceLocation location, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!Directory.Exists(location.CanonicalPath)) throw new DirectoryNotFoundException("등록된 폴더에 접근할 수 없습니다.");
+        if (!Directory.Exists(location.CanonicalPath))
+            throw new DirectoryNotFoundException("The registered workspace directory is unavailable.");
         Process.Start(new ProcessStartInfo { FileName = location.CanonicalPath, UseShellExecute = true });
         return ValueTask.CompletedTask;
     }

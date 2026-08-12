@@ -67,8 +67,12 @@ OpenSessionRequest
 - 시스템, 애플리케이션 설정, 임시, 네트워크, 이동식, 알려진 클라우드 동기화 및 symlink/reparse point 위치를 거부합니다.
 - JSON Registry에서 스키마 버전을 확인하고 손상을 감지합니다.
 - 임시 파일 기록, 디스크 flush 및 파일 교체를 사용하여 Registry를 갱신합니다.
+- Desktop 사용자 문자열과 작업공간 오류 메시지를 영어 중립 `Strings.resx`와 한국어 `Strings.ko-KR.resx` 리소스로 관리합니다.
+- Domain, Application 및 Platform 계층은 사용자 문장을 반환하지 않고 `WorkspaceValidationCode`만 전달하며, Desktop 계층에서 현재 UI 문화권에 맞는 문구로 변환합니다.
 
 작업공간 등록은 파일 보호 활성화와 분리되어 있습니다. 등록된 작업공간의 초기 보호 상태는 `NotActivated`이며, 등록하거나 등록을 해제해도 기존 폴더와 파일을 암호화·변환·삭제·덮어쓰지 않습니다.
+
+현재 지원 UI culture는 `en-US`와 `ko-KR`이며, 영어를 기본 fallback으로 사용합니다. 지원되는 시스템 culture는 exact match 또는 언어 수준 match로 결정할 수 있습니다. 사용자 언어 선택 UI, 선택 값 저장, 앱 시작 전 preference 적용 및 실행 중 언어 전환은 아직 구현하지 않았습니다.
 
 ## 요구 사항
 

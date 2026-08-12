@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="App.Title" xml:space="preserve"><value>DRM Workspaces</value></data>
+  <data name="Language.English" xml:space="preserve"><value>English</value></data>
+  <data name="Language.Korean" xml:space="preserve"><value>Korean</value></data>
+  <data name="Workspace.Title" xml:space="preserve"><value>Protected Workspaces</value></data>
+  <data name="Workspace.Description" xml:space="preserve"><value>Register folders as protection targets. This step does not encrypt or modify any files.</value></data>
+  <data name="Workspace.Add" xml:space="preserve"><value>Add Folder</value></data>
+  <data name="Workspace.Unregister" xml:space="preserve"><value>Unregister</value><comment>Removes only the workspace registration. Never deletes, decrypts, or modifies files.</comment></data>
+  <data name="Workspace.OpenLocation" xml:space="preserve"><value>Open Folder Location</value></data>
+  <data name="Workspace.Picker.Title" xml:space="preserve"><value>Select a folder to register for protection</value></data>
+  <data name="Workspace.Status.Registered" xml:space="preserve"><value>Registered</value></data>
+  <data name="Workspace.Status.Unavailable" xml:space="preserve"><value>Unavailable</value></data>
+  <data name="Workspace.Protection.NotActivated" xml:space="preserve"><value>File protection has not been activated.</value><comment>Registration alone does not mean that files are protected.</comment></data>
+  <data name="Workspace.Protection.CheckStatus" xml:space="preserve"><value>Check the file protection status.</value></data>
+  <data name="Workspace.Activity.Loading" xml:space="preserve"><value>Loading workspaces...</value></data>
+  <data name="Workspace.Activity.Registering" xml:space="preserve"><value>Registering folder...</value></data>
+  <data name="Workspace.Activity.Unregistering" xml:space="preserve"><value>Unregistering workspace...</value></data>
+  <data name="Workspace.Picker.Unavailable" xml:space="preserve"><value>The folder picker is not available on this platform.</value></data>
+  <data name="Workspace.Load.Corrupted" xml:space="preserve"><value>The workspace settings are corrupted. Check the settings file.</value></data>
+  <data name="Workspace.Load.Failed" xml:space="preserve"><value>The workspace list could not be loaded.</value></data>
+  <data name="Workspace.Unregister.NotFound" xml:space="preserve"><value>The workspace was already unregistered or could not be found.</value></data>
+  <data name="Workspace.Unregister.SaveFailed" xml:space="preserve"><value>The unregister operation could not be saved. The folder and its files were not changed.</value></data>
+  <data name="Workspace.Open.Failed" xml:space="preserve"><value>The registered folder could not be opened.</value></data>
+  <data name="Workspace.Validation.Allowed" xml:space="preserve"><value>The folder can be registered.</value></data>
+  <data name="Workspace.Validation.InvalidPath" xml:space="preserve"><value>The path is not a valid local folder path.</value></data>
+  <data name="Workspace.Validation.DoesNotExist" xml:space="preserve"><value>The selected folder does not exist.</value></data>
+  <data name="Workspace.Validation.NotDirectory" xml:space="preserve"><value>The selected location is not a folder.</value></data>
+  <data name="Workspace.Validation.AccessDenied" xml:space="preserve"><value>The selected folder does not have the required read and write permissions.</value></data>
+  <data name="Workspace.Validation.FileSystemRootNotAllowed" xml:space="preserve"><value>A file system root cannot be registered.</value></data>
+  <data name="Workspace.Validation.SystemLocationNotAllowed" xml:space="preserve"><value>Operating system and program folders cannot be registered.</value></data>
+  <data name="Workspace.Validation.ApplicationLocationNotAllowed" xml:space="preserve"><value>Application and settings folders cannot be registered.</value></data>
+  <data name="Workspace.Validation.TemporaryLocationNotAllowed" xml:space="preserve"><value>Temporary folders cannot be registered.</value></data>
+  <data name="Workspace.Policy.Duplicate" xml:space="preserve"><value>This folder is already registered.</value></data>
+  <data name="Workspace.Policy.ExistingContainsCandidate" xml:space="preserve"><value>A folder inside an existing workspace cannot be registered.</value></data>
+  <data name="Workspace.Policy.CandidateContainsExisting" xml:space="preserve"><value>A parent folder containing an existing workspace cannot be registered.</value></data>
+  <data name="Workspace.Validation.SymbolicLinkNotSupported" xml:space="preserve"><value>Symbolic links and reparse points are not supported.</value></data>
+  <data name="Workspace.Validation.NetworkLocationNotSupported" xml:space="preserve"><value>Network folders are not currently supported.</value></data>
+  <data name="Workspace.Validation.RemovableLocationNotSupported" xml:space="preserve"><value>Removable storage is not currently supported.</value></data>
+  <data name="Workspace.Validation.CloudLocationNotSupported" xml:space="preserve"><value>Cloud-synchronized folders are not currently supported.</value></data>
+  <data name="Workspace.Validation.UnsupportedFileSystem" xml:space="preserve"><value>The storage device or file system is not supported.</value></data>
+  <data name="Workspace.Storage.SaveFailed" xml:space="preserve"><value>The workspace settings could not be saved. Try again.</value></data>
+  <data name="Workspace.Storage.Corrupted" xml:space="preserve"><value>The workspace settings are corrupted, so the folder cannot be registered.</value></data>
+  <data name="Common.UnexpectedError" xml:space="preserve"><value>An unexpected error occurred.</value></data>
+</root>

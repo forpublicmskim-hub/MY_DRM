@@ -5,12 +5,12 @@
         x:DataType="vm:MainViewModel"
         Width="920" Height="600" MinWidth="720" MinHeight="460"
         Icon="/Assets/avalonia-logo.ico"
-        Title="DRM 작업공간">
+        Title="{Binding AppTitle}">
   <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="28" RowSpacing="16">
     <StackPanel Grid.Row="0" Spacing="6">
-      <TextBlock FontSize="28" FontWeight="SemiBold" Text="보호 작업공간" />
+      <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding WorkspaceTitle}" />
       <TextBlock Foreground="Gray"
-                 Text="보호 대상으로 폴더를 등록합니다. 이 단계에서는 파일을 암호화하거나 변경하지 않습니다." />
+                 Text="{Binding WorkspaceDescription}" />
     </StackPanel>
 
     <Border Grid.Row="1" BorderBrush="#60656D" BorderThickness="1" CornerRadius="8">
@@ -32,9 +32,9 @@
     </Border>
 
     <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
-      <Button Command="{Binding AddFolderCommand}" Content="폴더 추가" />
-      <Button Command="{Binding UnregisterCommand}" Content="등록 해제" />
-      <Button Command="{Binding OpenPathCommand}" Content="폴더 위치 보기" />
+      <Button Command="{Binding AddFolderCommand}" Content="{Binding AddFolderLabel}" />
+      <Button Command="{Binding UnregisterCommand}" Content="{Binding UnregisterLabel}" />
+      <Button Command="{Binding OpenPathCommand}" Content="{Binding OpenLocationLabel}" />
       <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding ActivityMessage}" />
     </StackPanel>
 

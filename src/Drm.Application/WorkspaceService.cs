@@ -56,13 +56,13 @@ public sealed class WorkspaceService(
             }
             catch (WorkspaceRegistryCorruptedException)
             {
-                return WorkspaceRegistrationResult.Failure(WorkspaceValidationResult.Denied(
-                    WorkspaceValidationCode.RegistryCorrupted, "작업공간 설정이 손상되어 등록할 수 없습니다."));
+                return WorkspaceRegistrationResult.Failure(
+                    WorkspaceValidationResult.Denied(WorkspaceValidationCode.RegistryCorrupted));
             }
             catch (WorkspaceRegistryException)
             {
-                return WorkspaceRegistrationResult.Failure(WorkspaceValidationResult.Denied(
-                    WorkspaceValidationCode.PersistenceFailed, "작업공간 설정을 저장하지 못했습니다. 다시 시도해 주세요."));
+                return WorkspaceRegistrationResult.Failure(
+                    WorkspaceValidationResult.Denied(WorkspaceValidationCode.PersistenceFailed));
             }
         }
         finally { _mutationGate.Release(); }

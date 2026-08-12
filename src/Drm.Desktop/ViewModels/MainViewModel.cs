@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Drm.Application;
 using Drm.Desktop.Services;
+using Drm.Desktop.Localization;
 using Drm.Domain;
 using Drm.Platform.Abstractions;
 
@@ -11,11 +12,19 @@ namespace Drm.Desktop.ViewModels;
 public sealed partial class MainViewModel(
     WorkspaceService workspaces,
     IFolderPicker folderPicker,
-    IWorkspacePathLauncher pathLauncher) : ViewModelBase, IAsyncDisposable
+    IWorkspacePathLauncher pathLauncher,
+    ILocalizationService localization,
+    WorkspaceErrorLocalizer workspaceErrors) : ViewModelBase, IAsyncDisposable
 {
     private readonly CancellationTokenSource _lifetime = new();
 
     public ObservableCollection<WorkspaceItemViewModel> Items { get; } = [];
+    public string AppTitle => localization.GetString("App.Title");
+    public string WorkspaceTitle => localization.GetString("Workspace.Title");
+    public string WorkspaceDescription => localization.GetString("Workspace.Description");
+    public string AddFolderLabel => localization.GetString("Workspace.Add");
+    public string UnregisterLabel => localization.GetString("Workspace.Unregister");
+    public string OpenLocationLabel => localization.GetString("Workspace.OpenLocation");
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UnregisterCommand), nameof(OpenPathCommand))]
@@ -36,9 +45,9 @@ public sealed partial class MainViewModel(
     [ObservableProperty]
     public partial string? ErrorMessage { get; set; }
 
-    public string ActivityMessage => IsLoading ? "목록을 불러오는 중..."
-        : IsRegistering ? "폴더를 등록하는 중..."
-        : IsUnregistering ? "등록을 해제하는 중..." : string.Empty;
+    public string ActivityMessage => IsLoading ? localization.GetString("Workspace.Activity.Loading")
+        : IsRegistering ? localization.GetString("Workspace.Activity.Registering")
+        : IsUnregistering ? localization.GetString("Workspace.Activity.Unregistering") : string.Empty;
 
     public async ValueTask InitializeAsync()
     {
@@ -47,8 +56,8 @@ public sealed partial class MainViewModel(
         OnPropertyChanged(nameof(ActivityMessage));
         ErrorMessage = null;
         try { await ReloadAsync(_lifetime.Token); }
-        catch (WorkspaceRegistryCorruptedException) { ErrorMessage = "작업공간 설정이 손상되었습니다. 설정 파일을 확인해 주세요."; }
-        catch (WorkspaceRegistryException) { ErrorMessage = "작업공간 목록을 불러오지 못했습니다."; }
+        catch (WorkspaceRegistryCorruptedException) { ErrorMessage = localization.GetString("Workspace.Load.Corrupted"); }
+        catch (WorkspaceRegistryException) { ErrorMessage = localization.GetString("Workspace.Load.Failed"); }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
         finally { IsLoading = false; OnPropertyChanged(nameof(ActivityMessage)); }
     }
@@ -62,7 +71,7 @@ public sealed partial class MainViewModel(
         string? path;
         try { path = await folderPicker.PickAsync(_lifetime.Token); }
         catch (OperationCanceledException) { return; }
-        catch (InvalidOperationException exception) { ErrorMessage = exception.Message; return; }
+        catch (FolderPickerUnavailableException) { ErrorMessage = localization.GetString("Workspace.Picker.Unavailable"); return; }
         if (path is null) return;
 
         IsRegistering = true;
@@ -70,7 +79,7 @@ public sealed partial class MainViewModel(
         try
         {
             WorkspaceRegistrationResult result = await workspaces.RegisterAsync(path, _lifetime.Token);
-            if (!result.IsSuccess) { ErrorMessage = result.Validation.UserMessage; return; }
+            if (!result.IsSuccess) { ErrorMessage = workspaceErrors.GetMessage(result.Validation.Code); return; }
             await ReloadAsync(_lifetime.Token);
             SelectedItem = Items.FirstOrDefault(item => item.Id == result.Workspace!.Id);
         }
@@ -91,11 +100,11 @@ public sealed partial class MainViewModel(
         try
         {
             bool removed = await workspaces.UnregisterAsync(selected.Id, _lifetime.Token);
-            if (!removed) { ErrorMessage = "이미 등록 해제되었거나 찾을 수 없는 작업공간입니다."; return; }
+            if (!removed) { ErrorMessage = localization.GetString("Workspace.Unregister.NotFound"); return; }
             Items.Remove(selected);
             SelectedItem = null;
         }
-        catch (WorkspaceRegistryException) { ErrorMessage = "등록 해제 내용을 저장하지 못했습니다. 폴더와 파일은 변경되지 않았습니다."; }
+        catch (WorkspaceRegistryException) { ErrorMessage = localization.GetString("Workspace.Unregister.SaveFailed"); }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
         finally { IsUnregistering = false; OnPropertyChanged(nameof(ActivityMessage)); }
     }
@@ -107,7 +116,7 @@ public sealed partial class MainViewModel(
         ErrorMessage = null;
         try { await pathLauncher.OpenAsync(SelectedItem.Workspace.Location, _lifetime.Token); }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
-        { ErrorMessage = "등록된 폴더를 열 수 없습니다."; }
+        { ErrorMessage = localization.GetString("Workspace.Open.Failed"); }
     }
 
     private async ValueTask ReloadAsync(CancellationToken cancellationToken)
@@ -115,7 +124,7 @@ public sealed partial class MainViewModel(
         IReadOnlyList<ProtectedWorkspace> loaded = await workspaces.GetAllAsync(cancellationToken);
         Items.Clear();
         foreach (ProtectedWorkspace workspace in loaded.OrderBy(item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase))
-            Items.Add(new WorkspaceItemViewModel(workspace));
+            Items.Add(new WorkspaceItemViewModel(workspace, localization));
     }
 
     public ValueTask DisposeAsync()
@@ -127,14 +136,15 @@ public sealed partial class MainViewModel(
     }
 }
 
-public sealed class WorkspaceItemViewModel(ProtectedWorkspace workspace)
+public sealed class WorkspaceItemViewModel(ProtectedWorkspace workspace, ILocalizationService localization)
 {
     public ProtectedWorkspace Workspace { get; } = workspace;
     public WorkspaceId Id => Workspace.Id;
     public string DisplayName => Workspace.DisplayName;
     public string Path => Workspace.Location.DisplayPath;
-    public string Status => Workspace.RegistrationState == WorkspaceRegistrationState.Registered ? "등록됨" : "접근 불가";
+    public string Status => Workspace.RegistrationState == WorkspaceRegistrationState.Registered
+        ? localization.GetString("Workspace.Status.Registered") : localization.GetString("Workspace.Status.Unavailable");
     public string ProtectionNotice => Workspace.ProtectionState == WorkspaceProtectionState.NotActivated
-        ? "파일 보호 기능은 아직 활성화되지 않았습니다."
-        : "파일 보호 상태를 확인해 주세요.";
+        ? localization.GetString("Workspace.Protection.NotActivated")
+        : localization.GetString("Workspace.Protection.CheckStatus");
 }

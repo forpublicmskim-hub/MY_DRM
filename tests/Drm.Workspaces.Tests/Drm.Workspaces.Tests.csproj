@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\src\Drm.Infrastructure\Drm.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Drm.Platform.Abstractions\Drm.Platform.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Drm.Platform.Local\Drm.Platform.Local.csproj" />
+    <ProjectReference Include="..\..\src\Drm.Desktop\Drm.Desktop.csproj" />
   </ItemGroup>
 
 </Project>

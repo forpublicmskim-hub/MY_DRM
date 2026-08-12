@@ -25,7 +25,7 @@ public sealed class JsonWorkspaceRegistry(string registryPath) : IWorkspaceRegis
         {
             List<ProtectedWorkspace> workspaces = [.. await ReadUnsafeAsync(cancellationToken).ConfigureAwait(false)];
             if (workspaces.Any(item => item.Id == workspace.Id))
-                throw new WorkspaceRegistryException("동일한 WorkspaceId가 이미 존재합니다.");
+                throw new WorkspaceRegistryException("A duplicate WorkspaceId was detected.");
             workspaces.Add(workspace);
             await WriteUnsafeAsync(workspaces, cancellationToken).ConfigureAwait(false);
         }
@@ -56,28 +56,29 @@ public sealed class JsonWorkspaceRegistry(string registryPath) : IWorkspaceRegis
             RegistryDocument? document = await JsonSerializer.DeserializeAsync<RegistryDocument>(stream, JsonOptions, cancellationToken)
                 .ConfigureAwait(false);
             if (document is null || document.SchemaVersion != CurrentSchemaVersion || document.Workspaces is null)
-                throw new WorkspaceRegistryCorruptedException("지원하지 않거나 손상된 작업공간 설정입니다.");
+                throw new WorkspaceRegistryCorruptedException("The workspace registry has an unsupported schema or is corrupted.");
             return document.Workspaces.Select(ToDomain).ToArray();
         }
         catch (WorkspaceRegistryCorruptedException) { throw; }
         catch (JsonException exception)
         {
-            throw new WorkspaceRegistryCorruptedException("작업공간 설정 파일을 해석할 수 없습니다.", exception);
+            throw new WorkspaceRegistryCorruptedException("The workspace registry could not be parsed.", exception);
         }
         catch (IOException exception)
         {
-            throw new WorkspaceRegistryException("작업공간 설정 파일을 읽지 못했습니다.", exception);
+            throw new WorkspaceRegistryException("The workspace registry could not be read.", exception);
         }
         catch (UnauthorizedAccessException exception)
         {
-            throw new WorkspaceRegistryException("작업공간 설정 파일에 접근할 수 없습니다.", exception);
+            throw new WorkspaceRegistryException("Access to the workspace registry was denied.", exception);
         }
     }
 
     private async ValueTask WriteUnsafeAsync(IReadOnlyList<ProtectedWorkspace> workspaces, CancellationToken cancellationToken)
     {
         string? directory = Path.GetDirectoryName(_registryPath);
-        if (string.IsNullOrEmpty(directory)) throw new WorkspaceRegistryException("Registry 경로에 상위 폴더가 없습니다.");
+        if (string.IsNullOrEmpty(directory))
+            throw new WorkspaceRegistryException("The workspace registry path has no parent directory.");
         string temporaryPath = Path.Combine(directory, $".{Path.GetFileName(_registryPath)}.{Guid.NewGuid():N}.tmp");
         RegistryDocument document = new(CurrentSchemaVersion, workspaces.Select(ToDto).ToArray());
 
@@ -96,7 +97,7 @@ public sealed class JsonWorkspaceRegistry(string registryPath) : IWorkspaceRegis
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            throw new WorkspaceRegistryException("작업공간 설정 파일을 저장하지 못했습니다.", exception);
+            throw new WorkspaceRegistryException("The workspace registry could not be saved.", exception);
         }
         finally
         {

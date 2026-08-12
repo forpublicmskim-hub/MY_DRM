@@ -26,3 +26,13 @@
 현재 `CanonicalPath`는 중복·중첩 판정에 사용되지만 신뢰 가능한 영구 파일 시스템 식별자는 아니다. 폴더 이동, mount 변경 또는 검증 직후 위치 교체를 완전히 방어하지 못한다. 실제 암호화나 접근 통제를 수행하기 직전에는 위치를 다시 검증하고, 플랫폼별 `PlatformIdentity`와 지속 접근 참조를 구현해야 한다.
 
 Registry는 비밀번호, 토큰 또는 키를 저장하지 않는다. 다중 프로세스 동시 쓰기와 서비스 소유 Registry는 다음 마일스톤 범위다.
+
+## 사용자 문자열과 오류 코드
+
+사용자 표시 문자열은 `Drm.Desktop/Localization/Strings.resx`의 한국어 기준 리소스에서 관리한다. XAML, ViewModel과 Folder Picker는 `ILocalizationService`를 통해 문자열을 얻으며, Domain·Application·Platform 계층은 현재 UI 문화권이나 번역 문구를 알지 않는다.
+
+`WorkspaceValidationResult`는 `IsAllowed`와 `WorkspaceValidationCode`만 반환한다. `WorkspaceErrorLocalizer`가 명시적인 switch mapping으로 오류 코드를 의미 기반 리소스 키에 연결한다. enum 이름을 리소스 키로 직접 사용하지 않으며, 알 수 없는 코드는 `Common.UnexpectedError`로 fallback한다.
+
+Registry와 파일 시스템 adapter의 예외 메시지는 사용자에게 직접 표시하지 않는 내부 진단 정보다. Desktop은 예외 형식 또는 오류 코드를 번역 가능한 일반 문구로 변환한다. 경로와 원본 OS 오류 같은 민감한 진단 정보는 현재 원격 telemetry로 전송하지 않는다.
+
+이번 단계는 한국어 문자열 외부화 기반만 제공한다. 영어 리소스, 사용자 언어 설정, `settings.json`, 실행 중 문화권 변경은 아직 구현하지 않았다.

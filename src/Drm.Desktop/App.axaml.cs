@@ -5,6 +5,7 @@ using Drm.Application;
 using Drm.Desktop.ViewModels;
 using Drm.Desktop.Views;
 using Drm.Desktop.Services;
+using Drm.Desktop.Localization;
 using Drm.Infrastructure;
 using Drm.Platform.Local;
 
@@ -26,11 +27,13 @@ public partial class App : Avalonia.Application
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Drm", "workspaces.json");
             LocalWorkspaceLocationResolver locations = new();
+            LocalizationService localization = new();
             WorkspaceService workspaceService = new(
                 new JsonWorkspaceRegistry(settingsPath), locations,
                 new WorkspaceRegistrationPolicy(locations), new SystemClock());
             window.DataContext = new MainViewModel(workspaceService,
-                new AvaloniaFolderPicker(() => window), new LocalWorkspacePathLauncher());
+                new AvaloniaFolderPicker(() => window, localization), new LocalWorkspacePathLauncher(),
+                localization, new WorkspaceErrorLocalizer(localization));
             desktop.MainWindow = window;
         }
 

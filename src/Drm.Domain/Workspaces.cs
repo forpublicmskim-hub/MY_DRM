@@ -45,8 +45,8 @@ public enum WorkspaceValidationCode
     RegistryCorrupted
 }
 
-public sealed record WorkspaceValidationResult(bool IsAllowed, WorkspaceValidationCode Code, string UserMessage)
+public sealed record WorkspaceValidationResult(bool IsAllowed, WorkspaceValidationCode Code)
 {
-    public static WorkspaceValidationResult Allowed() => new(true, WorkspaceValidationCode.Allowed, "등록할 수 있습니다.");
-    public static WorkspaceValidationResult Denied(WorkspaceValidationCode code, string message) => new(false, code, message);
+    public static WorkspaceValidationResult Allowed() => new(true, WorkspaceValidationCode.Allowed);
+    public static WorkspaceValidationResult Denied(WorkspaceValidationCode code) => new(false, code);
 }

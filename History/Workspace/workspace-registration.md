@@ -38,3 +38,27 @@
 
 - [[initial-drm-lifecycle-architecture]]
 - [작업공간 등록 설계](../../docs/workspace-registration.md)
+
+## 한국어 문자열 외부화
+
+### 변경 사항
+
+- 관련 소스, XAML과 Markdown을 엄격한 UTF-8로 검사했다. 현재 작업트리에서는 잘못된 UTF-8 바이트나 대체 문자로 손상된 사용자 문자열이 재현되지 않았다.
+- XAML, `MainViewModel`, Folder Picker와 Workspace 사용자 오류의 한국어 문구를 `Drm.Desktop/Localization/Strings.resx`로 이동했다.
+- `ILocalizationService`와 한국어 기준 `LocalizationService`를 추가하고 Desktop composition root에서 UI 구성 요소에 주입했다.
+- `WorkspaceValidationResult`에서 `UserMessage`를 제거해 Domain·Application·Platform 계층이 `WorkspaceValidationCode`만 반환하도록 변경했다.
+- `WorkspaceErrorLocalizer`에 모든 오류 코드의 명시적 리소스 키 mapping과 알 수 없는 코드의 일반 오류 fallback을 추가했다.
+- `JsonWorkspaceRegistry`와 플랫폼 adapter에는 사용자 번역과 분리된 내부 진단 예외만 남겼다.
+
+### 설계
+
+오류 enum 이름과 리소스 키를 직접 결합하지 않는다. `Workspace.Validation`, `Workspace.Policy`, `Workspace.Storage` 영역을 포함한 의미 기반 키를 사용하므로 코드 식별자 변경이나 화면별 문구 확장 시 번역 키를 독립적으로 유지할 수 있다.
+
+이번 변경은 국제화 기반에만 한정한다. `en-US`, 언어 선택 UI, 사용자 preferences, 시작 전 culture 선택 및 즉시 전환은 포함하지 않는다.
+
+### 검증
+
+- 전체 Workspace 오류 코드가 비어 있지 않은 한국어 리소스에 mapping되는지 검증했다.
+- 알 수 없는 오류 코드 fallback, 리소스 중복·빈 값, 한국어 기준 문자열, 사용자 결과의 문장 비저장과 관련 파일의 엄격한 UTF-8 decoding을 검증했다.
+- Avalonia application XAML 리소스가 실제로 로드되는지 검증했다.
+- 전체 빌드는 경고 0개, 오류 0개로 통과했고 기존 테스트 9개와 Workspace 테스트 21개가 모두 통과했다.

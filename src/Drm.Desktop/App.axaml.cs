@@ -31,7 +31,10 @@ public partial class App : Avalonia.Application
             WorkspaceService workspaceService = new(
                 new JsonWorkspaceRegistry(settingsPath), locations,
                 new WorkspaceRegistrationPolicy(locations), new SystemClock());
-            window.DataContext = new MainViewModel(workspaceService,
+            LocalWorkspaceScanner scanner = new();
+            WorkspaceMonitorManager monitors = new(
+                new FileSystemWatcherWorkspaceMonitorFactory(scanner));
+            window.DataContext = new MainViewModel(workspaceService, monitors,
                 new AvaloniaFolderPicker(() => window, localization), new LocalWorkspacePathLauncher(),
                 localization);
             desktop.MainWindow = window;

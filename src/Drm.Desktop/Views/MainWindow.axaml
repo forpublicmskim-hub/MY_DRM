@@ -6,7 +6,7 @@
         Width="920" Height="600" MinWidth="720" MinHeight="460"
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding AppTitle}">
-  <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="28" RowSpacing="16">
+  <Grid RowDefinitions="Auto,*,140,Auto,Auto" Margin="28" RowSpacing="16">
     <StackPanel Grid.Row="0" Spacing="6">
       <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding WorkspaceTitle}" />
       <TextBlock Foreground="Gray"
@@ -17,7 +17,7 @@
       <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:WorkspaceItemViewModel">
-            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="14,10">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="14,10">
               <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
               <Border Grid.Row="0" Grid.Column="1" Padding="10,3" CornerRadius="10" Background="#263B58">
                 <TextBlock Text="{Binding Status}" />
@@ -25,20 +25,40 @@
               <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
               <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="#D18A30"
                          Text="{Binding ProtectionNotice}" />
+              <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="#6FA8DC"
+                         Text="{Binding MonitorStatus}" />
             </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
     </Border>
 
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
+    <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="6">
+      <TextBlock FontWeight="SemiBold" Text="{Binding RecentObservationsTitle}" />
+      <Border Grid.Row="1" BorderBrush="#60656D" BorderThickness="1" CornerRadius="8" Padding="8">
+        <ListBox ItemsSource="{Binding RecentObservations}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:WorkspaceObservationItemViewModel">
+              <Grid ColumnDefinitions="100,100,*,Auto" Margin="6,3">
+                <TextBlock Grid.Column="0" Text="{Binding ObservedAt}" />
+                <TextBlock Grid.Column="1" Text="{Binding Kind}" />
+                <TextBlock Grid.Column="2" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="3" Text="{Binding WorkspaceName}" Foreground="Gray" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+    </Grid>
+
+    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10">
       <Button Command="{Binding AddFolderCommand}" Content="{Binding AddFolderLabel}" />
       <Button Command="{Binding UnregisterCommand}" Content="{Binding UnregisterLabel}" />
       <Button Command="{Binding OpenPathCommand}" Content="{Binding OpenLocationLabel}" />
       <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding ActivityMessage}" />
     </StackPanel>
 
-    <Border Grid.Row="3" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+    <Border Grid.Row="4" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
             Background="#4A2525" CornerRadius="6" Padding="12">
       <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
     </Border>

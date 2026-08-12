@@ -1,5 +1,11 @@
 # DRM
 
+## Workspace 파일 감시
+
+Desktop 실행 중 등록된 Workspace의 기존 파일을 스캔하고 생성·변경·삭제·이름 변경을 관찰합니다. 감시 오류가 발생하면 전체 재스캔으로 현재 상태를 다시 확인합니다.
+
+이 기능은 관찰 전용입니다. 파일을 암호화·삭제·이동하지 않으며 다른 프로그램의 접근을 차단하지 않습니다. `감시 중`은 DRM 보호가 활성화되었다는 의미가 아닙니다. 자세한 제한 사항은 [Workspace 파일 감시](docs/workspace-monitoring.md)를 참조하세요.
+
 .NET 10 기반으로 DRM 생명주기와 보호 대상 작업공간을 안전하게 관리하기 위한 기반 프로젝트입니다. 현재 구현은 도메인, 애플리케이션, 플랫폼 및 UI의 책임을 분리하고 세션 상태 전이, 콘텐츠 open pipeline, 로컬 작업공간 등록 절차를 제공합니다.
 
 > [!WARNING]
@@ -89,7 +95,7 @@ dotnet build Drm.slnx
 dotnet test Drm.slnx
 ```
 
-현재 자동화 테스트는 DRM 라이프사이클과 작업공간 등록·영속성·경로 정책을 검증합니다.
+현재 자동화 테스트는 DRM 라이프사이클과 작업공간 등록·영속성·경로 정책 및 파일 감시를 검증합니다.
 
 ## Desktop 실행
 
@@ -129,5 +135,7 @@ History/                      주요 변경의 배경과 설계 이력
 
 - [아키텍처](docs/architecture.md)
 - [작업공간 등록](docs/workspace-registration.md)
+- [Workspace 파일 감시](docs/workspace-monitoring.md)
 - [초기 DRM 라이프사이클 변경 이력](History/Architecture/initial-drm-lifecycle-architecture.md)
 - [작업공간 등록 변경 이력](History/Workspace/workspace-registration.md)
+- [Workspace 파일 감시 변경 이력](History/Workspace/workspace-file-monitoring.md)

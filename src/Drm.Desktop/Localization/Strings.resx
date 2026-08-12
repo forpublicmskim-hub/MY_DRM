@@ -26,6 +26,20 @@
   <data name="Workspace.Unregister.NotFound" xml:space="preserve"><value>The workspace was already unregistered or could not be found.</value></data>
   <data name="Workspace.Unregister.SaveFailed" xml:space="preserve"><value>The unregister operation could not be saved. The folder and its files were not changed.</value></data>
   <data name="Workspace.Open.Failed" xml:space="preserve"><value>The registered folder could not be opened.</value></data>
+  <data name="Workspace.Monitor.RecentObservations" xml:space="preserve"><value>Recent file observations</value></data>
+  <data name="Workspace.Monitor.State.Starting" xml:space="preserve"><value>Starting monitor</value></data>
+  <data name="Workspace.Monitor.State.Watching" xml:space="preserve"><value>Monitoring</value></data>
+  <data name="Workspace.Monitor.State.Rescanning" xml:space="preserve"><value>Rescanning</value></data>
+  <data name="Workspace.Monitor.State.Degraded" xml:space="preserve"><value>Monitoring degraded</value></data>
+  <data name="Workspace.Monitor.State.Stopping" xml:space="preserve"><value>Stopping monitor</value></data>
+  <data name="Workspace.Monitor.State.Faulted" xml:space="preserve"><value>Monitoring failed</value></data>
+  <data name="Workspace.Monitor.State.Stopped" xml:space="preserve"><value>Monitoring stopped</value></data>
+  <data name="Workspace.Observation.Existing" xml:space="preserve"><value>Existing item</value></data>
+  <data name="Workspace.Observation.Created" xml:space="preserve"><value>Added</value></data>
+  <data name="Workspace.Observation.Modified" xml:space="preserve"><value>Modified</value></data>
+  <data name="Workspace.Observation.Deleted" xml:space="preserve"><value>Deleted</value></data>
+  <data name="Workspace.Observation.Renamed" xml:space="preserve"><value>Renamed</value></data>
+  <data name="Workspace.Observation.Unknown" xml:space="preserve"><value>Unknown</value></data>
   <data name="Workspace.Validation.Allowed" xml:space="preserve"><value>The folder can be registered.</value></data>
   <data name="Workspace.Validation.InvalidPath" xml:space="preserve"><value>The path is not a valid local folder path.</value></data>
   <data name="Workspace.Validation.DoesNotExist" xml:space="preserve"><value>The selected folder does not exist.</value></data>

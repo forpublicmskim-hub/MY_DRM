@@ -57,6 +57,10 @@ public sealed partial class LocalizationTests
             localization.GetStringForCulture("Workspace.Validation.DoesNotExist", English));
         Assert.Equal("선택한 폴더가 존재하지 않습니다.",
             localization.GetStringForCulture("Workspace.Validation.DoesNotExist", Korean));
+        Assert.Equal("Monitoring", localization.GetStringForCulture("Workspace.Monitor.State.Watching", English));
+        Assert.Equal("감시 중", localization.GetStringForCulture("Workspace.Monitor.State.Watching", Korean));
+        Assert.Equal("Renamed", localization.GetStringForCulture("Workspace.Observation.Renamed", English));
+        Assert.Equal("이름 변경됨", localization.GetStringForCulture("Workspace.Observation.Renamed", Korean));
     }
 
     [Fact]

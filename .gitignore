@@ -4,3 +4,4 @@ obj/
 *.user
 artifacts/
 local-state/
+MY_DRM_Target_Directory*/

@@ -8,9 +8,13 @@
     <Project Path="src/Drm.ManagedEngine/Drm.ManagedEngine.csproj" />
     <Project Path="src/Drm.Platform.Abstractions/Drm.Platform.Abstractions.csproj" />
     <Project Path="src/Drm.Platform.Local/Drm.Platform.Local.csproj" />
+    <Project Path="src/Drm.Policy/Drm.Policy.csproj" />
+    <Project Path="src/Drm.PolicyMaker/Drm.PolicyMaker.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Drm.Application.Tests/Drm.Application.Tests.csproj" />
+    <Project Path="tests/Drm.Policy.Tests/Drm.Policy.Tests.csproj" />
+    <Project Path="tests/Drm.PolicyMaker.Tests/Drm.PolicyMaker.Tests.csproj" />
     <Project Path="tests/Drm.Workspaces.Tests/Drm.Workspaces.Tests.csproj" />
   </Folder>
 </Solution>

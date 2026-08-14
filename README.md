@@ -80,6 +80,16 @@ OpenSessionRequest
 
 현재 지원 UI culture는 `en-US`와 `ko-KR`이며, 영어를 기본 fallback으로 사용합니다. 지원되는 시스템 culture는 exact match 또는 언어 수준 match로 결정할 수 있습니다. 사용자 언어 선택 UI, 선택 값 저장, 앱 시작 전 preference 적용 및 실행 중 언어 전환은 아직 구현하지 않았습니다.
 
+### 개발용 Policy Maker
+
+- 일반 DRM Desktop과 분리된 Avalonia `Drm.PolicyMaker` 실행 파일을 제공합니다.
+- 보호 정책 Draft를 새로 만들거나 기존 JSON을 열어 편집·검증·미리보기·Save As 할 수 있습니다.
+- 포함·제외 확장자, 신규·기존 파일 후보 지정, 최대 파일 크기 및 UTC 유효기간을 지원합니다.
+- 같은 `Drm.Policy` 라이브러리가 정규화, 구조화된 검증, capability 호환성, JSON 직렬화와 실행 snapshot 생성을 담당합니다.
+- 같은 정책은 결정적인 JSON으로 저장하며 임시 파일을 다시 로드·검증한 후 대상 파일로 교체합니다.
+
+Policy Maker가 만드는 결과는 `Draft` 상태의 unsigned development policy입니다. 전자서명, 관리자 인증, 승인, 중앙 배포, 회수 및 실제 파일 보호 집행은 제공하지 않습니다. 생성된 JSON을 운영 정책으로 신뢰해서는 안 됩니다.
+
 ## 요구 사항
 
 - .NET 10 SDK
@@ -105,6 +115,14 @@ dotnet run --project src/Drm.Desktop/Drm.Desktop.csproj
 
 작업공간 목록은 사용자별 로컬 애플리케이션 데이터 디렉터리의 `Drm/workspaces.json`에 저장됩니다. Windows의 기본 위치는 `%LOCALAPPDATA%\Drm\workspaces.json`입니다. 이 Registry에는 비밀번호, 인증 token 또는 암호화 key를 저장하지 않습니다.
 
+## Policy Maker 실행
+
+```powershell
+dotnet run --project src/Drm.PolicyMaker/Drm.PolicyMaker.csproj
+```
+
+정책 계약과 현재 제한 사항은 [Policy Maker 및 정책 Draft](docs/policy-maker.md)를 참조하세요.
+
 ## 현재 제약 사항
 
 - 작업공간은 이미 존재하며 읽기·쓰기가 가능한 로컬 고정 디스크의 일반 디렉터리만 지원합니다.
@@ -123,6 +141,8 @@ src/
   Drm.ManagedEngine/          개발·테스트용 보호 콘텐츠 엔진
   Drm.Platform.Abstractions/  플랫폼별 기능의 공통 경계
   Drm.Platform.Local/         로컬 파일 시스템 위치 검증과 실행 adapter
+  Drm.Policy/                 정책 계약, 검증, 정규화, 직렬화와 실행 snapshot
+  Drm.PolicyMaker/            Avalonia 기반 개발용 정책 Draft 작성 도구
   Drm.Desktop/                Avalonia 기반 작업공간 관리 UI
   Drm.Host/                   향후 Windows 서비스 진입점
 native/include/               네이티브 연동용 C ABI 초안
@@ -136,6 +156,8 @@ History/                      주요 변경의 배경과 설계 이력
 - [아키텍처](docs/architecture.md)
 - [작업공간 등록](docs/workspace-registration.md)
 - [Workspace 파일 감시](docs/workspace-monitoring.md)
+- [Policy Maker 및 정책 Draft](docs/policy-maker.md)
 - [초기 DRM 라이프사이클 변경 이력](History/Architecture/initial-drm-lifecycle-architecture.md)
 - [작업공간 등록 변경 이력](History/Workspace/workspace-registration.md)
 - [Workspace 파일 감시 변경 이력](History/Workspace/workspace-file-monitoring.md)
+- [Policy Maker 변경 이력](History/Policy/policy-maker-foundation.md)

@@ -85,6 +85,7 @@ OpenSessionRequest
 - 일반 DRM Desktop과 분리된 Avalonia `Drm.PolicyMaker` 실행 파일을 제공합니다.
 - 보호 정책 Draft를 새로 만들거나 기존 JSON을 열어 편집·검증·미리보기·Save As 할 수 있습니다.
 - 포함·제외 확장자, 신규·기존 파일 후보 지정, 최대 파일 크기 및 UTC 유효기간을 지원합니다.
+- 유효기간은 달력과 시간 Picker로 입력하며, 편집 내용은 250ms debounce 후 JSON 미리보기에 자동 반영됩니다.
 - 같은 `Drm.Policy` 라이브러리가 정규화, 구조화된 검증, capability 호환성, JSON 직렬화와 실행 snapshot 생성을 담당합니다.
 - 같은 정책은 결정적인 JSON으로 저장하며 임시 파일을 다시 로드·검증한 후 대상 파일로 교체합니다.
 

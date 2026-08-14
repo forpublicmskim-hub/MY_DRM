@@ -12,6 +12,9 @@
 - 결정적 JSON과 임시 파일 재검증 기반 Save As를 구현했습니다.
 - 새 정책 작성, 열기, 검증 오류, 읽기 전용 미리보기와 저장 UI를 추가했습니다.
 - 의미 있는 수정 시 로컬 정책 version을 증가시킵니다.
+- UTC 유효기간을 달력·시간 Picker로 입력하도록 변경했습니다.
+- 편집 입력을 250ms debounce한 뒤 검증하고 JSON 미리보기를 자동 갱신합니다.
+- 오류 입력에서는 마지막 유효 JSON을 유지합니다.
 
 ## 설계
 
@@ -26,8 +29,8 @@ Policy Maker에는 운영 서명 키와 발행 권한을 넣지 않았습니다.
 ## 검증
 
 - `dotnet build Drm.slnx -c Release --no-restore`가 경고 0개, 오류 0개로 통과했습니다.
-- `Drm.Policy.Tests` 8개와 `Drm.PolicyMaker.Tests` 3개가 통과했습니다.
-- 기존 Application 테스트 9개와 Workspace 테스트 36개를 포함해 전체 56개 테스트가 통과했습니다.
+- `Drm.Policy.Tests` 8개와 `Drm.PolicyMaker.Tests` 5개가 통과했습니다.
+- 기존 Application 테스트 9개와 Workspace 테스트 36개를 포함해 전체 58개 테스트가 통과했습니다.
 
 ## 관련 문서
 

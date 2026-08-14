@@ -33,10 +33,20 @@
           <TextBox Text="{Binding ExcludedExtensions}" AcceptsReturn="True" MinHeight="76" />
           <TextBlock Text="최대 파일 크기 (bytes, 빈 값은 제한 없음)" />
           <TextBox Text="{Binding MaximumFileSizeBytes}" />
-          <TextBlock Text="유효 시작 UTC (ISO 8601, 선택)" />
-          <TextBox Text="{Binding ValidFromUtc}" PlaceholderText="2026-08-14T00:00:00Z" />
-          <TextBlock Text="유효 종료 UTC (ISO 8601, 선택)" />
-          <TextBox Text="{Binding ValidUntilUtc}" />
+          <TextBlock Text="유효 시작 (선택한 날짜와 시간을 UTC로 저장)" />
+          <Grid ColumnDefinitions="2*,*,Auto" ColumnSpacing="8">
+            <CalendarDatePicker Grid.Column="0" SelectedDate="{Binding ValidFromDate}"
+                                PlaceholderText="시작 날짜 선택" />
+            <TimePicker Grid.Column="1" SelectedTime="{Binding ValidFromTime}" />
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" FontWeight="SemiBold" Text="UTC" />
+          </Grid>
+          <TextBlock Text="유효 종료 (선택한 날짜와 시간을 UTC로 저장)" />
+          <Grid ColumnDefinitions="2*,*,Auto" ColumnSpacing="8">
+            <CalendarDatePicker Grid.Column="0" SelectedDate="{Binding ValidUntilDate}"
+                                PlaceholderText="종료 날짜 선택" />
+            <TimePicker Grid.Column="1" SelectedTime="{Binding ValidUntilTime}" />
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" FontWeight="SemiBold" Text="UTC" />
+          </Grid>
 
           <TextBlock Margin="0,8,0,0" FontWeight="SemiBold" Text="검증 결과" />
           <ItemsControl ItemsSource="{Binding ValidationErrors}">

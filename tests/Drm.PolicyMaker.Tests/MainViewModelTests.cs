@@ -63,6 +63,47 @@ public sealed class MainViewModelTests
         Assert.Contains("schemaVersion", viewModel.JsonPreview, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task LivePreviewUpdatesAfterDebounceAndKeepsLastValidJsonOnError()
+    {
+        using MainViewModel viewModel = new(new FileDialogStub());
+        viewModel.IncludedExtensions = ".pdf";
+
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
+
+        Assert.Contains(".pdf", viewModel.JsonPreview, StringComparison.Ordinal);
+        string lastValidPreview = viewModel.JsonPreview;
+
+        viewModel.IncludedExtensions = ".drm";
+        await Task.Delay(TimeSpan.FromMilliseconds(500));
+
+        Assert.Equal(lastValidPreview, viewModel.JsonPreview);
+        Assert.NotEmpty(viewModel.ValidationErrors);
+    }
+
+    [Fact]
+    public async Task DateAndTimePickersArePersistedAsUtc()
+    {
+        using TemporaryDirectory directory = new();
+        string path = Path.Combine(directory.Path, "validity.json");
+        using MainViewModel viewModel = new(new FileDialogStub { SavePath = path })
+        {
+            DisplayName = "기간 정책",
+            ValidFromDate = new DateTimeOffset(2026, 8, 14, 0, 0, 0, TimeSpan.FromHours(9)),
+            ValidFromTime = new TimeSpan(9, 30, 0),
+            ValidUntilDate = new DateTimeOffset(2026, 8, 15, 0, 0, 0, TimeSpan.FromHours(-4)),
+            ValidUntilTime = new TimeSpan(18, 45, 0)
+        };
+
+        await viewModel.SaveAsCommand.ExecuteAsync(null);
+
+        PolicyLoadResult loaded = await PolicyFileStore.LoadAsync(path);
+        Assert.Equal(new DateTimeOffset(2026, 8, 14, 9, 30, 0, TimeSpan.Zero),
+            loaded.Document!.Validity.ValidFromUtc);
+        Assert.Equal(new DateTimeOffset(2026, 8, 15, 18, 45, 0, TimeSpan.Zero),
+            loaded.Document.Validity.ValidUntilUtc);
+    }
+
     private sealed class FileDialogStub : IPolicyFileDialog
     {
         public string? OpenPath { get; init; }

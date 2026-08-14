@@ -29,6 +29,10 @@ Editor가 검증한 파일도 저장 후 변조될 수 있으므로 소비자는
 
 현재 지원 항목은 정책 ID·version·이름, `draft` 상태, 활성화 여부, 신규·기존 파일 후보 지정, 포함·제외 확장자, 최대 파일 크기, UTC 유효기간과 `requiredCapabilities`입니다.
 
+유효기간은 `CalendarDatePicker`와 `TimePicker`로 입력합니다. 화면에서 선택한 날짜와 시간은 명시적으로 UTC로 조합되며, 날짜를 선택하지 않으면 해당 시작 또는 종료 제한이 없는 것으로 처리합니다. 날짜를 처음 선택하면 시간은 `00:00`으로 초기화됩니다.
+
+정책 편집 속성이 바뀌면 250ms debounce 후 공통 validator와 serializer를 다시 실행합니다. 유효한 입력은 읽기 전용 JSON 미리보기에 자동 반영됩니다. 입력이 유효하지 않으면 검증 오류를 갱신하되 마지막 유효 JSON을 유지합니다. 저장 시에는 자동 미리보기 결과를 신뢰하지 않고 전체 검증을 다시 수행합니다.
+
 지원 capability는 다음과 같습니다.
 
 - `protection.extension-filter.v1`

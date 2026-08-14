@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,9 +10,18 @@ namespace Drm.PolicyMaker.ViewModels;
 
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
+    private static readonly TimeSpan PreviewDebounceInterval = TimeSpan.FromMilliseconds(250);
+    private static readonly HashSet<string> PreviewInputProperties =
+    [
+        nameof(DisplayName), nameof(Enabled), nameof(ProtectNewFiles), nameof(ProtectExistingFiles),
+        nameof(IncludedExtensions), nameof(ExcludedExtensions), nameof(MaximumFileSizeBytes),
+        nameof(ValidFromDate), nameof(ValidFromTime), nameof(ValidUntilDate), nameof(ValidUntilTime)
+    ];
     private readonly IPolicyFileDialog _fileDialog;
     private readonly CancellationTokenSource _lifetime = new();
+    private CancellationTokenSource? _previewRefresh;
     private ProtectionPolicyDocument? _baseline;
+    private bool _suppressPreviewRefresh;
 
     public MainViewModel(IPolicyFileDialog fileDialog)
     {
@@ -28,13 +38,79 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] public partial string IncludedExtensions { get; set; } = string.Empty;
     [ObservableProperty] public partial string ExcludedExtensions { get; set; } = string.Empty;
     [ObservableProperty] public partial string MaximumFileSizeBytes { get; set; } = string.Empty;
-    [ObservableProperty] public partial string ValidFromUtc { get; set; } = string.Empty;
-    [ObservableProperty] public partial string ValidUntilUtc { get; set; } = string.Empty;
+    [ObservableProperty] public partial DateTimeOffset? ValidFromDate { get; set; }
+    [ObservableProperty] public partial TimeSpan? ValidFromTime { get; set; }
+    [ObservableProperty] public partial DateTimeOffset? ValidUntilDate { get; set; }
+    [ObservableProperty] public partial TimeSpan? ValidUntilTime { get; set; }
     [ObservableProperty] public partial string JsonPreview { get; set; } = string.Empty;
     [ObservableProperty] public partial string StatusMessage { get; set; } = string.Empty;
     [ObservableProperty] public partial bool IsBusy { get; set; }
 
     public ObservableCollection<string> ValidationErrors { get; } = [];
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (!_suppressPreviewRefresh && e.PropertyName is not null && PreviewInputProperties.Contains(e.PropertyName))
+            SchedulePreviewRefresh();
+    }
+
+    partial void OnValidFromDateChanged(DateTimeOffset? value)
+    {
+        if (value is null) ValidFromTime = null;
+        else ValidFromTime ??= TimeSpan.Zero;
+    }
+
+    partial void OnValidUntilDateChanged(DateTimeOffset? value)
+    {
+        if (value is null) ValidUntilTime = null;
+        else ValidUntilTime ??= TimeSpan.Zero;
+    }
+
+    private void SchedulePreviewRefresh()
+    {
+        CancellationTokenSource next = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token);
+        CancellationTokenSource? previous = Interlocked.Exchange(ref _previewRefresh, next);
+        previous?.Cancel();
+        previous?.Dispose();
+        _ = RefreshPreviewAfterDelayAsync(next);
+    }
+
+    private void CancelPreviewRefresh()
+    {
+        CancellationTokenSource? pending = Interlocked.Exchange(ref _previewRefresh, null);
+        pending?.Cancel();
+        pending?.Dispose();
+    }
+
+    private async Task RefreshPreviewAfterDelayAsync(CancellationTokenSource refresh)
+    {
+        try
+        {
+            await Task.Delay(PreviewDebounceInterval, refresh.Token);
+            RefreshPreview(showSuccessStatus: false);
+        }
+        catch (OperationCanceledException) when (refresh.IsCancellationRequested) { }
+        finally
+        {
+            if (ReferenceEquals(Interlocked.CompareExchange(ref _previewRefresh, null, refresh), refresh))
+                refresh.Dispose();
+        }
+    }
+
+    private void RefreshPreview(bool showSuccessStatus)
+    {
+        if (!TryBuildDocument(out ProtectionPolicyDocument? document))
+        {
+            StatusMessage = "현재 입력에 오류가 있어 마지막 유효 JSON을 유지합니다.";
+            return;
+        }
+
+        JsonPreview = ProtectionPolicySerializer.Serialize(document!);
+        StatusMessage = showSuccessStatus
+            ? "유효한 unsigned development Draft입니다."
+            : "입력 내용이 JSON 미리보기에 반영되었습니다.";
+    }
 
     [RelayCommand]
     private void NewPolicy() => ResetDraft();
@@ -42,10 +118,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void Validate()
     {
-        ValidationErrors.Clear();
-        if (!TryBuildDocument(out ProtectionPolicyDocument? document)) return;
-        JsonPreview = ProtectionPolicySerializer.Serialize(document!);
-        StatusMessage = "유효한 unsigned development Draft입니다.";
+        CancelPreviewRefresh();
+        RefreshPreview(showSuccessStatus: true);
     }
 
     [RelayCommand]
@@ -79,6 +153,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private async Task SaveAsAsync()
     {
         if (IsBusy) return;
+        CancelPreviewRefresh();
         ValidationErrors.Clear();
         if (!TryBuildDocument(out ProtectionPolicyDocument? document)) return;
         document = ApplyVersion(document!);
@@ -117,10 +192,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             ValidationErrors.Add("policyId: 올바른 GUID가 필요합니다.");
         if (!TryNullableLong(MaximumFileSizeBytes, out long? maximum))
             ValidationErrors.Add("protection.maximumFileSizeBytes: 양의 정수가 필요합니다.");
-        if (!TryUtc(ValidFromUtc, out DateTimeOffset? validFrom))
-            ValidationErrors.Add("validity.validFromUtc: ISO 8601 UTC 시간이 필요합니다.");
-        if (!TryUtc(ValidUntilUtc, out DateTimeOffset? validUntil))
-            ValidationErrors.Add("validity.validUntilUtc: ISO 8601 UTC 시간이 필요합니다.");
+        DateTimeOffset? validFrom = CombineUtc(ValidFromDate, ValidFromTime);
+        DateTimeOffset? validUntil = CombineUtc(ValidUntilDate, ValidUntilTime);
         if (ValidationErrors.Count > 0) return false;
 
         ProtectionPolicyDraft draft = new()
@@ -160,20 +233,30 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void LoadDocument(ProtectionPolicyDocument document)
     {
-        ProtectionPolicyDraft draft = PolicyNormalizer.ToDraft(document);
-        PolicyId = draft.PolicyId.ToString("D");
-        PolicyVersion = draft.PolicyVersion;
-        DisplayName = draft.DisplayName;
-        Enabled = draft.Enabled;
-        ProtectNewFiles = draft.ProtectNewFiles;
-        ProtectExistingFiles = draft.ProtectExistingFiles;
-        IncludedExtensions = string.Join(Environment.NewLine, draft.IncludedExtensions);
-        ExcludedExtensions = string.Join(Environment.NewLine, draft.ExcludedExtensions);
-        MaximumFileSizeBytes = draft.MaximumFileSizeBytes?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
-        ValidFromUtc = FormatUtc(draft.ValidFromUtc);
-        ValidUntilUtc = FormatUtc(draft.ValidUntilUtc);
-        JsonPreview = ProtectionPolicySerializer.Serialize(document);
-        ValidationErrors.Clear();
+        CancelPreviewRefresh();
+        _suppressPreviewRefresh = true;
+        try
+        {
+            ProtectionPolicyDraft draft = PolicyNormalizer.ToDraft(document);
+            PolicyId = draft.PolicyId.ToString("D");
+            PolicyVersion = draft.PolicyVersion;
+            DisplayName = draft.DisplayName;
+            Enabled = draft.Enabled;
+            ProtectNewFiles = draft.ProtectNewFiles;
+            ProtectExistingFiles = draft.ProtectExistingFiles;
+            IncludedExtensions = string.Join(Environment.NewLine, draft.IncludedExtensions);
+            ExcludedExtensions = string.Join(Environment.NewLine, draft.ExcludedExtensions);
+            MaximumFileSizeBytes = draft.MaximumFileSizeBytes?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+            DateTimeOffset? validFrom = draft.ValidFromUtc?.ToUniversalTime();
+            ValidFromDate = validFrom;
+            ValidFromTime = validFrom?.TimeOfDay;
+            DateTimeOffset? validUntil = draft.ValidUntilUtc?.ToUniversalTime();
+            ValidUntilDate = validUntil;
+            ValidUntilTime = validUntil?.TimeOfDay;
+            JsonPreview = ProtectionPolicySerializer.Serialize(document);
+            ValidationErrors.Clear();
+        }
+        finally { _suppressPreviewRefresh = false; }
         _baseline = document;
     }
 
@@ -223,17 +306,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         return parsed;
     }
 
-    private static bool TryUtc(string value, out DateTimeOffset? result)
+    private static DateTimeOffset? CombineUtc(DateTimeOffset? date, TimeSpan? time)
     {
-        if (string.IsNullOrWhiteSpace(value)) { result = null; return true; }
-        bool parsed = DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture,
-            DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out DateTimeOffset timestamp);
-        result = parsed ? timestamp : null;
-        return parsed;
+        if (date is null) return null;
+        TimeSpan selectedTime = time ?? TimeSpan.Zero;
+        return new DateTimeOffset(
+            date.Value.Year, date.Value.Month, date.Value.Day,
+            selectedTime.Hours, selectedTime.Minutes, selectedTime.Seconds,
+            TimeSpan.Zero);
     }
-
-    private static string FormatUtc(DateTimeOffset? value) =>
-        value?.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture) ?? string.Empty;
 
     private static string SafeSuggestedName(string displayName)
     {
@@ -245,6 +326,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _lifetime.Cancel();
+        CancelPreviewRefresh();
         _lifetime.Dispose();
     }
 }

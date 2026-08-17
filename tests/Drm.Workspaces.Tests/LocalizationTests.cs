@@ -193,6 +193,30 @@ public sealed partial class LocalizationTests
         App application = new();
         application.Initialize();
         Assert.NotEmpty(application.Styles);
+        AssertThemePalette(application);
+    }
+
+    private static void AssertThemePalette(App application)
+    {
+        string[] requiredKeys =
+        [
+            "AppBackgroundBrush",
+            "AppSurfaceBrush",
+            "AppSurfaceElevatedBrush",
+            "AppBorderBrush",
+            "AppTextPrimaryBrush",
+            "AppTextSecondaryBrush",
+            "AppAccentBrush",
+            "AppAccentSurfaceBrush",
+            "AppAccentPressedBrush",
+            "AppWarningBrush",
+            "AppWarningSurfaceBrush",
+            "AppDangerBrush",
+            "AppDangerSurfaceBrush"
+        ];
+
+        Assert.All(requiredKeys, key =>
+            Assert.True(application.Resources.ContainsKey(key), $"Missing theme resource: {key}"));
     }
 
     [Fact]

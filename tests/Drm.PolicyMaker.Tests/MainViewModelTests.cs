@@ -7,6 +7,32 @@ namespace Drm.PolicyMaker.Tests;
 public sealed class MainViewModelTests
 {
     [Fact]
+    public void AvaloniaApplicationProvidesTheAccessibleDarkPalette()
+    {
+        App application = new();
+        application.Initialize();
+        string[] requiredKeys =
+        [
+            "AppBackgroundBrush",
+            "AppSurfaceBrush",
+            "AppSurfaceElevatedBrush",
+            "AppBorderBrush",
+            "AppTextPrimaryBrush",
+            "AppTextSecondaryBrush",
+            "AppAccentBrush",
+            "AppAccentSurfaceBrush",
+            "AppAccentPressedBrush",
+            "AppWarningBrush",
+            "AppWarningSurfaceBrush",
+            "AppDangerBrush",
+            "AppDangerSurfaceBrush"
+        ];
+
+        Assert.All(requiredKeys, key =>
+            Assert.True(application.Resources.ContainsKey(key), $"Missing theme resource: {key}"));
+    }
+
+    [Fact]
     public async Task SavesValidDraftAndIncrementsVersionAfterMeaningfulChange()
     {
         using TemporaryDirectory directory = new();

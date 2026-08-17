@@ -68,6 +68,7 @@ OpenSessionRequest
 ### 작업공간 등록
 
 - Avalonia 기반 Desktop 관리 화면을 제공합니다.
+- Desktop과 Policy Maker는 navy-charcoal 배경, 구분된 surface, 고대비 본문·보조 텍스트와 일관된 정보·경고·오류 색을 사용하는 다크 UI를 제공합니다.
 - 로컬 폴더를 등록하고 목록을 조회하며, 폴더 위치 열기와 등록 해제를 지원합니다.
 - 동일하거나 서로 포함되는 작업공간이 중복 등록되지 않도록 방지합니다.
 - 시스템, 애플리케이션 설정, 임시, 네트워크, 이동식, 알려진 클라우드 동기화 및 symlink/reparse point 위치를 거부합니다.

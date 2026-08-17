@@ -2,7 +2,49 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Drm.PolicyMaker.App"
              RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#111827" />
+    <SolidColorBrush x:Key="AppSurfaceBrush" Color="#1F2937" />
+    <SolidColorBrush x:Key="AppSurfaceElevatedBrush" Color="#29364A" />
+    <SolidColorBrush x:Key="AppBorderBrush" Color="#526176" />
+    <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#F1F5F9" />
+    <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#CBD5E1" />
+    <SolidColorBrush x:Key="AppAccentBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="AppAccentSurfaceBrush" Color="#1E3A5F" />
+    <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#294E7A" />
+    <SolidColorBrush x:Key="AppWarningBrush" Color="#FBBF24" />
+    <SolidColorBrush x:Key="AppWarningSurfaceBrush" Color="#4A3515" />
+    <SolidColorBrush x:Key="AppDangerBrush" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="AppDangerSurfaceBrush" Color="#4C1D24" />
+  </Application.Resources>
   <Application.Styles>
     <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
+    </Style>
+    <Style Selector="TextBox, NumericUpDown, CalendarDatePicker, TimePicker, ListBox">
+      <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="Background" Value="{DynamicResource AppSurfaceElevatedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+    <Style Selector="Button:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AppAccentSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppAccentBrush}" />
+    </Style>
+    <Style Selector="Button:pressed">
+      <Setter Property="Background" Value="{DynamicResource AppAccentPressedBrush}" />
+    </Style>
+    <Style Selector="ScrollBar">
+      <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppBorderBrush}" />
+    </Style>
   </Application.Styles>
 </Application>

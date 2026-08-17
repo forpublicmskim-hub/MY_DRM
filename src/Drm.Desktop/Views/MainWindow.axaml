@@ -9,23 +9,23 @@
   <Grid ColumnDefinitions="2*,*" RowDefinitions="Auto,*,140,Auto,Auto" Margin="28" RowSpacing="16" ColumnSpacing="18">
     <StackPanel Grid.Row="0" Spacing="6">
       <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding WorkspaceTitle}" />
-      <TextBlock Foreground="Gray"
+      <TextBlock Foreground="{DynamicResource AppTextSecondaryBrush}"
                  Text="{Binding WorkspaceDescription}" />
     </StackPanel>
 
-    <Border Grid.Row="1" BorderBrush="#60656D" BorderThickness="1" CornerRadius="8">
+    <Border Grid.Row="1" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8">
       <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:WorkspaceItemViewModel">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="14,10">
               <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
-              <Border Grid.Row="0" Grid.Column="1" Padding="10,3" CornerRadius="10" Background="#263B58">
+              <Border Grid.Row="0" Grid.Column="1" Padding="10,3" CornerRadius="10" Background="{DynamicResource AppAccentSurfaceBrush}">
                 <TextBlock Text="{Binding Status}" />
               </Border>
               <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
-              <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="#D18A30"
+              <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="{DynamicResource AppWarningBrush}"
                          Text="{Binding ProtectionNotice}" />
-              <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="#6FA8DC"
+              <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Margin="0,4,0,0" Foreground="{DynamicResource AppAccentBrush}"
                          Text="{Binding MonitorStatus}" />
             </Grid>
           </DataTemplate>
@@ -35,7 +35,7 @@
 
     <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="6">
       <TextBlock FontWeight="SemiBold" Text="{Binding RecentObservationsTitle}" />
-      <Border Grid.Row="1" BorderBrush="#60656D" BorderThickness="1" CornerRadius="8" Padding="8">
+      <Border Grid.Row="1" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
         <ListBox ItemsSource="{Binding RecentObservations}">
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:WorkspaceObservationItemViewModel">
@@ -43,7 +43,7 @@
                 <TextBlock Grid.Column="0" Text="{Binding ObservedAt}" />
                 <TextBlock Grid.Column="1" Text="{Binding Kind}" />
                 <TextBlock Grid.Column="2" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Grid.Column="3" Text="{Binding WorkspaceName}" Foreground="Gray" />
+                <TextBlock Grid.Column="3" Text="{Binding WorkspaceName}" Foreground="{DynamicResource AppTextSecondaryBrush}" />
               </Grid>
             </DataTemplate>
           </ListBox.ItemTemplate>
@@ -52,14 +52,14 @@
     </Grid>
 
     <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
-            BorderBrush="#60656D" BorderThickness="1" CornerRadius="8" Padding="16">
+            Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
       <ScrollViewer>
         <StackPanel Spacing="10">
           <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding Policy.Title}" />
-          <TextBlock Foreground="Gray" TextWrapping="Wrap" Text="{Binding Policy.Description}" />
+          <TextBlock Foreground="{DynamicResource AppTextSecondaryBrush}" TextWrapping="Wrap" Text="{Binding Policy.Description}" />
           <Button HorizontalAlignment="Left" Command="{Binding Policy.LoadPolicyCommand}"
                   Content="{Binding Policy.LoadLabel}" />
-          <TextBlock TextWrapping="Wrap" Foreground="#D18A30" Text="{Binding Policy.StatusMessage}" />
+          <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource AppWarningBrush}" Text="{Binding Policy.StatusMessage}" />
 
           <StackPanel IsVisible="{Binding Policy.Summary, Converter={x:Static ObjectConverters.IsNotNull}}"
                       Spacing="7" Margin="0,6,0,0">
@@ -75,10 +75,10 @@
               <TextBlock Grid.Row="3" Text="{Binding Policy.DocumentStateLabel}" />
               <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Policy.Summary.DocumentState}" />
               <TextBlock Grid.Row="4" Text="{Binding Policy.TrustStateLabel}" />
-              <TextBlock Grid.Row="4" Grid.Column="1" Foreground="#D18A30"
+              <TextBlock Grid.Row="4" Grid.Column="1" Foreground="{DynamicResource AppWarningBrush}"
                          Text="{Binding Policy.Summary.TrustState}" TextWrapping="Wrap" />
               <TextBlock Grid.Row="5" Text="{Binding Policy.EnforcementStateLabel}" />
-              <TextBlock Grid.Row="5" Grid.Column="1" Foreground="#D18A30"
+              <TextBlock Grid.Row="5" Grid.Column="1" Foreground="{DynamicResource AppWarningBrush}"
                          Text="{Binding Policy.Summary.EnforcementState}" />
               <TextBlock Grid.Row="6" Text="{Binding Policy.IncludedLabel}" />
               <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Policy.Summary.IncludedExtensions}" TextWrapping="Wrap" />
@@ -96,7 +96,7 @@
           <ItemsControl ItemsSource="{Binding Policy.ValidationErrors}">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <TextBlock Foreground="#E07B7B" TextWrapping="Wrap" Text="{Binding}" />
+                <TextBlock Foreground="{DynamicResource AppDangerBrush}" TextWrapping="Wrap" Text="{Binding}" />
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
@@ -112,7 +112,8 @@
     </StackPanel>
 
     <Border Grid.Row="4" Grid.ColumnSpan="2" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-            Background="#4A2525" CornerRadius="6" Padding="12">
+            Background="{DynamicResource AppDangerSurfaceBrush}" BorderBrush="{DynamicResource AppDangerBrush}"
+            BorderThickness="1" CornerRadius="6" Padding="12">
       <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
     </Border>
   </Grid>

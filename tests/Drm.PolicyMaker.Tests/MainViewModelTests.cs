@@ -89,9 +89,9 @@ public sealed class MainViewModelTests
         using MainViewModel viewModel = new(new FileDialogStub { SavePath = path })
         {
             DisplayName = "기간 정책",
-            ValidFromDate = new DateTimeOffset(2026, 8, 14, 0, 0, 0, TimeSpan.FromHours(9)),
+            ValidFromDate = new DateTime(2026, 8, 14),
             ValidFromTime = new TimeSpan(9, 30, 0),
-            ValidUntilDate = new DateTimeOffset(2026, 8, 15, 0, 0, 0, TimeSpan.FromHours(-4)),
+            ValidUntilDate = new DateTime(2026, 8, 15),
             ValidUntilTime = new TimeSpan(18, 45, 0)
         };
 
@@ -102,6 +102,20 @@ public sealed class MainViewModelTests
             loaded.Document!.Validity.ValidFromUtc);
         Assert.Equal(new DateTimeOffset(2026, 8, 15, 18, 45, 0, TimeSpan.Zero),
             loaded.Document.Validity.ValidUntilUtc);
+    }
+
+    [Fact]
+    public void CalendarPickerDateTypeCanBeAssignedWithoutConversion()
+    {
+        using MainViewModel viewModel = new(new FileDialogStub());
+
+        viewModel.ValidFromDate = new DateTime(2026, 8, 22);
+        viewModel.ValidUntilDate = new DateTime(2026, 8, 23);
+
+        Assert.Equal(new DateTime(2026, 8, 22), viewModel.ValidFromDate);
+        Assert.Equal(TimeSpan.Zero, viewModel.ValidFromTime);
+        Assert.Equal(new DateTime(2026, 8, 23), viewModel.ValidUntilDate);
+        Assert.Equal(TimeSpan.Zero, viewModel.ValidUntilTime);
     }
 
     private sealed class FileDialogStub : IPolicyFileDialog

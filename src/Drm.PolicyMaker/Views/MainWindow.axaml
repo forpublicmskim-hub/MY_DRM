@@ -14,9 +14,11 @@
       </StackPanel>
     </Border>
 
-    <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="18">
-      <ScrollViewer Grid.Column="0">
-        <StackPanel Spacing="10">
+    <Grid Grid.Row="1" ColumnDefinitions="3*,2*" ColumnSpacing="18">
+      <ScrollViewer Grid.Column="0"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="0,0,12,0" Spacing="10">
           <TextBlock FontSize="18" FontWeight="SemiBold" Text="정책 정보" />
           <TextBlock Text="정책 이름" />
           <TextBox Text="{Binding DisplayName}" />
@@ -33,19 +35,29 @@
           <TextBox Text="{Binding ExcludedExtensions}" AcceptsReturn="True" MinHeight="76" />
           <TextBlock Text="최대 파일 크기 (bytes, 빈 값은 제한 없음)" />
           <TextBox Text="{Binding MaximumFileSizeBytes}" />
-          <TextBlock Text="유효 시작 (선택한 날짜와 시간을 UTC로 저장)" />
-          <Grid ColumnDefinitions="2*,*,Auto" ColumnSpacing="8">
+          <TextBlock Text="유효 시작 UTC" FontWeight="SemiBold" />
+          <TextBlock Foreground="Gray" Text="아래 날짜와 시간을 UTC 기준으로 저장합니다." />
+          <Grid ColumnDefinitions="*,140,48" ColumnSpacing="8">
             <CalendarDatePicker Grid.Column="0" SelectedDate="{Binding ValidFromDate}"
                                 PlaceholderText="시작 날짜 선택" />
-            <TimePicker Grid.Column="1" SelectedTime="{Binding ValidFromTime}" />
-            <TextBlock Grid.Column="2" VerticalAlignment="Center" FontWeight="SemiBold" Text="UTC" />
+            <TimePicker Grid.Column="1" SelectedTime="{Binding ValidFromTime}"
+                        ClockIdentifier="24HourClock" />
+            <Border Grid.Column="2" Background="#263B58" CornerRadius="5" Padding="7,4">
+              <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                         FontWeight="SemiBold" Text="UTC" />
+            </Border>
           </Grid>
-          <TextBlock Text="유효 종료 (선택한 날짜와 시간을 UTC로 저장)" />
-          <Grid ColumnDefinitions="2*,*,Auto" ColumnSpacing="8">
+          <TextBlock Margin="0,4,0,0" Text="유효 종료 UTC" FontWeight="SemiBold" />
+          <TextBlock Foreground="Gray" Text="종료 제한이 없으면 날짜를 선택하지 마세요." />
+          <Grid ColumnDefinitions="*,140,48" ColumnSpacing="8">
             <CalendarDatePicker Grid.Column="0" SelectedDate="{Binding ValidUntilDate}"
                                 PlaceholderText="종료 날짜 선택" />
-            <TimePicker Grid.Column="1" SelectedTime="{Binding ValidUntilTime}" />
-            <TextBlock Grid.Column="2" VerticalAlignment="Center" FontWeight="SemiBold" Text="UTC" />
+            <TimePicker Grid.Column="1" SelectedTime="{Binding ValidUntilTime}"
+                        ClockIdentifier="24HourClock" />
+            <Border Grid.Column="2" Background="#263B58" CornerRadius="5" Padding="7,4">
+              <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                         FontWeight="SemiBold" Text="UTC" />
+            </Border>
           </Grid>
 
           <TextBlock Margin="0,8,0,0" FontWeight="SemiBold" Text="검증 결과" />
@@ -68,15 +80,14 @@
       </Grid>
     </Grid>
 
-    <Grid Grid.Row="2" ColumnDefinitions="Auto,*" ColumnSpacing="16">
-      <StackPanel Orientation="Horizontal" Spacing="8">
+    <Grid Grid.Row="2" RowDefinitions="Auto,Auto" RowSpacing="8">
+      <WrapPanel Orientation="Horizontal">
         <Button Command="{Binding NewPolicyCommand}" Content="새로 만들기" />
         <Button Command="{Binding OpenCommand}" Content="열기" />
         <Button Command="{Binding ValidateCommand}" Content="검증 및 미리보기" />
         <Button Command="{Binding SaveAsCommand}" Content="다른 이름으로 저장" />
-      </StackPanel>
-      <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding StatusMessage}"
-                 TextTrimming="CharacterEllipsis" />
+      </WrapPanel>
+      <TextBlock Grid.Row="1" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
     </Grid>
   </Grid>
 </Window>

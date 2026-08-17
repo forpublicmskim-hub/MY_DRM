@@ -15,6 +15,8 @@
 - UTC 유효기간을 달력·시간 Picker로 입력하도록 변경했습니다.
 - 편집 입력을 250ms debounce한 뒤 검증하고 JSON 미리보기를 자동 갱신합니다.
 - 오류 입력에서는 마지막 유효 JSON을 유지합니다.
+- CalendarDatePicker.SelectedDate의 실제 DateTime? 계약과 ViewModel 타입을 일치시켜 날짜 선택 시 발생하던 InvalidCastException을 수정했습니다.
+- 입력 영역의 세로 scrollbar, 24시간제 시간 Picker, UTC badge와 줄바꿈 가능한 하단 명령·상태 영역을 정리했습니다.
 
 ## 설계
 
@@ -31,6 +33,7 @@ Policy Maker에는 운영 서명 키와 발행 권한을 넣지 않았습니다.
 - `dotnet build Drm.slnx -c Release --no-restore`가 경고 0개, 오류 0개로 통과했습니다.
 - `Drm.Policy.Tests` 8개와 `Drm.PolicyMaker.Tests` 5개가 통과했습니다.
 - 기존 Application 테스트 9개와 Workspace 테스트 36개를 포함해 전체 58개 테스트가 통과했습니다.
+- Policy Maker Release 빌드가 경고 0개, 오류 0개로 통과했고 날짜 바인딩 회귀 테스트를 포함한 Policy Maker 테스트 6개가 통과했습니다.
 
 ## 관련 문서
 

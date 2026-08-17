@@ -38,9 +38,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty] public partial string IncludedExtensions { get; set; } = string.Empty;
     [ObservableProperty] public partial string ExcludedExtensions { get; set; } = string.Empty;
     [ObservableProperty] public partial string MaximumFileSizeBytes { get; set; } = string.Empty;
-    [ObservableProperty] public partial DateTimeOffset? ValidFromDate { get; set; }
+    [ObservableProperty] public partial DateTime? ValidFromDate { get; set; }
     [ObservableProperty] public partial TimeSpan? ValidFromTime { get; set; }
-    [ObservableProperty] public partial DateTimeOffset? ValidUntilDate { get; set; }
+    [ObservableProperty] public partial DateTime? ValidUntilDate { get; set; }
     [ObservableProperty] public partial TimeSpan? ValidUntilTime { get; set; }
     [ObservableProperty] public partial string JsonPreview { get; set; } = string.Empty;
     [ObservableProperty] public partial string StatusMessage { get; set; } = string.Empty;
@@ -55,13 +55,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             SchedulePreviewRefresh();
     }
 
-    partial void OnValidFromDateChanged(DateTimeOffset? value)
+    partial void OnValidFromDateChanged(DateTime? value)
     {
         if (value is null) ValidFromTime = null;
         else ValidFromTime ??= TimeSpan.Zero;
     }
 
-    partial void OnValidUntilDateChanged(DateTimeOffset? value)
+    partial void OnValidUntilDateChanged(DateTime? value)
     {
         if (value is null) ValidUntilTime = null;
         else ValidUntilTime ??= TimeSpan.Zero;
@@ -248,10 +248,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             ExcludedExtensions = string.Join(Environment.NewLine, draft.ExcludedExtensions);
             MaximumFileSizeBytes = draft.MaximumFileSizeBytes?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
             DateTimeOffset? validFrom = draft.ValidFromUtc?.ToUniversalTime();
-            ValidFromDate = validFrom;
+            ValidFromDate = validFrom?.UtcDateTime.Date;
             ValidFromTime = validFrom?.TimeOfDay;
             DateTimeOffset? validUntil = draft.ValidUntilUtc?.ToUniversalTime();
-            ValidUntilDate = validUntil;
+            ValidUntilDate = validUntil?.UtcDateTime.Date;
             ValidUntilTime = validUntil?.TimeOfDay;
             JsonPreview = ProtectionPolicySerializer.Serialize(document);
             ValidationErrors.Clear();
@@ -306,7 +306,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         return parsed;
     }
 
-    private static DateTimeOffset? CombineUtc(DateTimeOffset? date, TimeSpan? time)
+    private static DateTimeOffset? CombineUtc(DateTime? date, TimeSpan? time)
     {
         if (date is null) return null;
         TimeSpan selectedTime = time ?? TimeSpan.Zero;

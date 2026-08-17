@@ -23,6 +23,12 @@ AuthenticationRequest
 
 정책 평가는 보호 콘텐츠를 활성화하기 전에 직접 호출하며, 실패하거나 명확한 허용 결과를 얻지 못하면 접근을 거부하는 fail-closed 방식을 따른다. 감사 로그, UI, telemetry는 결과를 관찰하는 역할만 담당하며 콘텐츠 접근 권한을 부여해서는 안 된다.
 
+## 로컬 보호 정책 소비 경계
+
+DRM Desktop의 정책 검증 기능은 파일 source, 정책 해석과 UI 표시를 분리한다. Drm.Platform.Local은 크기가 제한된 UTF-8 snapshot만 제공하고, Drm.Application은 공통 Drm.Policy validator와 compiler를 호출하여 성공한 EffectiveProtectionPolicy만 현재 inspection snapshot으로 게시한다.
+
+문서 유효성, 신뢰 상태와 집행 상태는 독립적이다. Debug 빌드는 unsigned Draft를 표시용으로 허용하지만 Release 빌드는 거부한다. 어떤 빌드에서도 현재 정책 snapshot은 Workspace 감시나 파일 보호에 적용되지 않는다. 자세한 계약은 [DRM 정책 소비 경계](policy-consumption.md)를 참조한다.
+
 ## 프로젝트 구성
 
 - `Drm.Domain`: 세션 및 연결 상태, 상태 전이표, 정책 모델, opaque handle, 불변 경계 타입을 정의한다.

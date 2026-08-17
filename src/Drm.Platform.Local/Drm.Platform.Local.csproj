@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Drm.Domain\Drm.Domain.csproj" />
     <ProjectReference Include="..\Drm.Application\Drm.Application.csproj" />
     <ProjectReference Include="..\Drm.Platform.Abstractions\Drm.Platform.Abstractions.csproj" />
+    <ProjectReference Include="..\Drm.Policy\Drm.Policy.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -91,6 +91,14 @@ OpenSessionRequest
 
 Policy Maker가 만드는 결과는 `Draft` 상태의 unsigned development policy입니다. 전자서명, 관리자 인증, 승인, 중앙 배포, 회수 및 실제 파일 보호 집행은 제공하지 않습니다. 생성된 JSON을 운영 정책으로 신뢰해서는 안 됩니다.
 
+### DRM Desktop 정책 검증
+
+- DRM Desktop에서 Policy Maker가 만든 로컬 JSON을 선택해 크기·UTF-8·JSON·schema·capability·정책 값을 다시 검증할 수 있습니다.
+- 검증에 성공한 문서는 불변 EffectiveProtectionPolicy snapshot으로 compile하고 정책 ID, version, 확장자, 최대 크기와 출처를 읽기 전용으로 표시합니다.
+- Debug 빌드에서만 unsigned development Draft를 표시용으로 허용합니다. Release 빌드는 동일 문서를 Untrusted로 거부합니다.
+- 정책 문서 검증, 신뢰 상태와 집행 상태를 구분하며, 불러온 정책은 작업공간·파일 감시·암호화에 적용하지 않습니다.
+- 정책 파일은 하나의 열린 stream에서 최대 1 MiB + 1 byte까지만 읽으며, 실패한 로드는 직전의 정상 snapshot을 교체하지 않습니다.
+
 ## 요구 사항
 
 - .NET 10 SDK
@@ -106,7 +114,7 @@ dotnet build Drm.slnx
 dotnet test Drm.slnx
 ```
 
-현재 자동화 테스트는 DRM 라이프사이클과 작업공간 등록·영속성·경로 정책 및 파일 감시를 검증합니다.
+현재 자동화 테스트는 DRM 라이프사이클, 작업공간 등록·영속성·경로 정책·파일 감시와 정책 작성·소비 경계를 검증합니다.
 
 ## Desktop 실행
 
@@ -158,7 +166,9 @@ History/                      주요 변경의 배경과 설계 이력
 - [작업공간 등록](docs/workspace-registration.md)
 - [Workspace 파일 감시](docs/workspace-monitoring.md)
 - [Policy Maker 및 정책 Draft](docs/policy-maker.md)
+- [DRM 정책 소비 경계](docs/policy-consumption.md)
 - [초기 DRM 라이프사이클 변경 이력](History/Architecture/initial-drm-lifecycle-architecture.md)
 - [작업공간 등록 변경 이력](History/Workspace/workspace-registration.md)
 - [Workspace 파일 감시 변경 이력](History/Workspace/workspace-file-monitoring.md)
 - [Policy Maker 변경 이력](History/Policy/policy-maker-foundation.md)
+- [DRM 정책 소비 경계 변경 이력](History/Policy/policy-consumption-boundary.md)

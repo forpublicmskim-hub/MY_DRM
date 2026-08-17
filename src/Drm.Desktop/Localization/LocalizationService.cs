@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Resources;
+using Drm.Application;
 using Drm.Domain;
+using Drm.Policy;
 
 namespace Drm.Desktop.Localization;
 
@@ -60,6 +62,44 @@ public static class WorkspaceMessageKeys
         WorkspaceValidationCode.UnsupportedFileSystem => "Workspace.Validation.UnsupportedFileSystem",
         WorkspaceValidationCode.PersistenceFailed => "Workspace.Storage.SaveFailed",
         WorkspaceValidationCode.RegistryCorrupted => "Workspace.Storage.Corrupted",
+        _ => "Common.UnexpectedError"
+    };
+}
+
+public static class PolicyMessageKeys
+{
+    public static string ForLoadStatus(ProtectionPolicyLoadStatus status) => status switch
+    {
+        ProtectionPolicyLoadStatus.Loaded => "Policy.Status.Loaded",
+        ProtectionPolicyLoadStatus.NotFound => "Policy.Status.NotFound",
+        ProtectionPolicyLoadStatus.AccessDenied => "Policy.Status.AccessDenied",
+        ProtectionPolicyLoadStatus.InvalidDocument => "Policy.Status.Invalid",
+        ProtectionPolicyLoadStatus.Unsupported => "Policy.Status.Unsupported",
+        ProtectionPolicyLoadStatus.TooLarge => "Policy.Status.TooLarge",
+        ProtectionPolicyLoadStatus.Untrusted => "Policy.Status.Untrusted",
+        ProtectionPolicyLoadStatus.Unavailable => "Policy.Status.Unavailable",
+        _ => "Common.UnexpectedError"
+    };
+
+    public static string ForValidation(string code) => code switch
+    {
+        PolicyValidationCodes.Required => "Policy.Validation.Required",
+        PolicyValidationCodes.InvalidSchemaVersion => "Policy.Validation.UnsupportedSchema",
+        PolicyValidationCodes.InvalidPolicyVersion => "Policy.Validation.InvalidVersion",
+        PolicyValidationCodes.InvalidExtension => "Policy.Validation.InvalidExtension",
+        PolicyValidationCodes.DuplicateExtension => "Policy.Validation.DuplicateExtension",
+        PolicyValidationCodes.ExtensionConflict => "Policy.Validation.ExtensionConflict",
+        PolicyValidationCodes.ProtectedExtensionIncluded => "Policy.Validation.ProtectedExtension",
+        PolicyValidationCodes.InvalidMaximumSize => "Policy.Validation.InvalidMaximumSize",
+        PolicyValidationCodes.InvalidValidityRange => "Policy.Validation.InvalidValidityRange",
+        PolicyValidationCodes.UnsupportedCapability => "Policy.Validation.UnsupportedCapability",
+        PolicyValidationCodes.MissingCapability => "Policy.Validation.MissingCapability",
+        PolicyValidationCodes.UnexpectedCapability => "Policy.Validation.UnexpectedCapability",
+        PolicyValidationCodes.ValueTooLong => "Policy.Validation.ValueTooLong",
+        PolicyValidationCodes.TooManyValues => "Policy.Validation.TooManyValues",
+        PolicyValidationCodes.DocumentTooLarge => "Policy.Validation.DocumentTooLarge",
+        PolicyValidationCodes.InvalidJson => "Policy.Validation.InvalidJson",
+        PolicyValidationCodes.PersistenceFailed => "Policy.Validation.PersistenceFailed",
         _ => "Common.UnexpectedError"
     };
 }

@@ -7,6 +7,54 @@
   <data name="App.Title" xml:space="preserve"><value>DRM Workspaces</value></data>
   <data name="Language.English" xml:space="preserve"><value>English</value></data>
   <data name="Language.Korean" xml:space="preserve"><value>Korean</value></data>
+  <data name="Policy.Inspection.Title" xml:space="preserve"><value>Development Policy Inspection</value></data>
+  <data name="Policy.Inspection.Description" xml:space="preserve"><value>Loads and validates an unsigned Draft for inspection only. It is not applied to workspaces or files.</value></data>
+  <data name="Policy.Inspection.Load" xml:space="preserve"><value>Load Policy</value></data>
+  <data name="Policy.Picker.Title" xml:space="preserve"><value>Select a development policy to inspect</value></data>
+  <data name="Policy.Picker.FileType" xml:space="preserve"><value>JSON policy</value></data>
+  <data name="Policy.Field.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Policy.Field.Id" xml:space="preserve"><value>Policy ID</value></data>
+  <data name="Policy.Field.Version" xml:space="preserve"><value>Version</value></data>
+  <data name="Policy.Field.IncludedExtensions" xml:space="preserve"><value>Included extensions</value></data>
+  <data name="Policy.Field.ExcludedExtensions" xml:space="preserve"><value>Excluded extensions</value></data>
+  <data name="Policy.Field.MaximumSize" xml:space="preserve"><value>Maximum file size</value></data>
+  <data name="Policy.Field.Source" xml:space="preserve"><value>Loaded file</value></data>
+  <data name="Policy.Field.LoadedAt" xml:space="preserve"><value>Loaded at</value></data>
+  <data name="Policy.Field.DocumentState" xml:space="preserve"><value>Document validation</value></data>
+  <data name="Policy.Field.TrustState" xml:space="preserve"><value>Trust</value></data>
+  <data name="Policy.Field.EnforcementState" xml:space="preserve"><value>Enforcement</value></data>
+  <data name="Policy.State.Document.Valid" xml:space="preserve"><value>Validated</value></data>
+  <data name="Policy.State.Trust.UnsignedDevelopmentDraft" xml:space="preserve"><value>Unsigned development Draft</value></data>
+  <data name="Policy.State.Enforcement.NotApplied" xml:space="preserve"><value>Not applied</value></data>
+  <data name="Policy.Value.None" xml:space="preserve"><value>None</value></data>
+  <data name="Policy.Value.NoLimit" xml:space="preserve"><value>No limit</value></data>
+  <data name="Policy.Status.NotLoaded" xml:space="preserve"><value>No policy has been loaded.</value></data>
+  <data name="Policy.Status.Loaded" xml:space="preserve"><value>Validated for inspection. This unsigned Draft is not applied.</value></data>
+  <data name="Policy.Status.NotFound" xml:space="preserve"><value>The policy file could not be found.</value></data>
+  <data name="Policy.Status.AccessDenied" xml:space="preserve"><value>The policy file cannot be read due to access restrictions.</value></data>
+  <data name="Policy.Status.Invalid" xml:space="preserve"><value>The policy document is invalid.</value></data>
+  <data name="Policy.Status.Unsupported" xml:space="preserve"><value>This policy requires a newer or compatible DRM client.</value></data>
+  <data name="Policy.Status.TooLarge" xml:space="preserve"><value>The policy file exceeds the 1 MiB limit.</value></data>
+  <data name="Policy.Status.Untrusted" xml:space="preserve"><value>The unsigned policy is not trusted in the current mode.</value></data>
+  <data name="Policy.Status.Unavailable" xml:space="preserve"><value>The policy file is temporarily unavailable.</value></data>
+  <data name="Policy.Status.PickerUnavailable" xml:space="preserve"><value>The policy file picker is not available on this platform.</value></data>
+  <data name="Policy.Validation.Required" xml:space="preserve"><value>A required policy value is missing.</value></data>
+  <data name="Policy.Validation.UnsupportedSchema" xml:space="preserve"><value>The schemaVersion is not supported.</value></data>
+  <data name="Policy.Validation.InvalidVersion" xml:space="preserve"><value>The policy version is invalid.</value></data>
+  <data name="Policy.Validation.InvalidExtension" xml:space="preserve"><value>An extension has an invalid format.</value></data>
+  <data name="Policy.Validation.DuplicateExtension" xml:space="preserve"><value>An extension is duplicated.</value></data>
+  <data name="Policy.Validation.ExtensionConflict" xml:space="preserve"><value>An extension appears in both include and exclude lists.</value></data>
+  <data name="Policy.Validation.ProtectedExtension" xml:space="preserve"><value>The protected container extension cannot be included.</value></data>
+  <data name="Policy.Validation.InvalidMaximumSize" xml:space="preserve"><value>The maximum file size is invalid.</value></data>
+  <data name="Policy.Validation.InvalidValidityRange" xml:space="preserve"><value>The policy validity range is invalid.</value></data>
+  <data name="Policy.Validation.UnsupportedCapability" xml:space="preserve"><value>The policy declares an unsupported capability.</value></data>
+  <data name="Policy.Validation.MissingCapability" xml:space="preserve"><value>A capability required by the policy values is missing.</value></data>
+  <data name="Policy.Validation.UnexpectedCapability" xml:space="preserve"><value>The policy declares an unexpected capability.</value></data>
+  <data name="Policy.Validation.ValueTooLong" xml:space="preserve"><value>A policy value exceeds the allowed length.</value></data>
+  <data name="Policy.Validation.TooManyValues" xml:space="preserve"><value>A policy list contains too many values.</value></data>
+  <data name="Policy.Validation.DocumentTooLarge" xml:space="preserve"><value>The policy document is too large.</value></data>
+  <data name="Policy.Validation.InvalidJson" xml:space="preserve"><value>The policy is not valid JSON.</value></data>
+  <data name="Policy.Validation.PersistenceFailed" xml:space="preserve"><value>The policy persistence operation failed.</value></data>
   <data name="Workspace.Title" xml:space="preserve"><value>Protected Workspaces</value></data>
   <data name="Workspace.Description" xml:space="preserve"><value>Register folders as protection targets. This step does not encrypt or modify any files.</value></data>
   <data name="Workspace.Add" xml:space="preserve"><value>Add Folder</value></data>

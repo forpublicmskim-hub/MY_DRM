@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using Drm.Desktop;
 using Drm.Desktop.Localization;
 using Drm.Domain;
+using Drm.Application;
+using Drm.Policy;
 
 namespace Drm.Workspaces.Tests;
 
@@ -24,6 +26,31 @@ public sealed partial class LocalizationTests
         foreach (WorkspaceValidationCode code in Enum.GetValues<WorkspaceValidationCode>())
         {
             string key = WorkspaceMessageKeys.ForValidation(code);
+            Assert.True(neutral.ContainsKey(key), $"Missing neutral resource: {key}");
+            Assert.True(korean.ContainsKey(key), $"Missing ko-KR resource: {key}");
+        }
+    }
+
+    [Fact]
+    public void EveryPolicyLoadStatusAndValidationCodeMapsToEverySupportedCulture()
+    {
+        Dictionary<string, string> neutral = LoadResource("Strings.resx");
+        Dictionary<string, string> korean = LoadResource("Strings.ko-KR.resx");
+
+        foreach (ProtectionPolicyLoadStatus status in Enum.GetValues<ProtectionPolicyLoadStatus>())
+        {
+            string key = PolicyMessageKeys.ForLoadStatus(status);
+            Assert.True(neutral.ContainsKey(key), $"Missing neutral resource: {key}");
+            Assert.True(korean.ContainsKey(key), $"Missing ko-KR resource: {key}");
+        }
+
+        IEnumerable<string> codes = typeof(PolicyValidationCodes)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(field => field.IsLiteral && !field.IsInitOnly && field.FieldType == typeof(string))
+            .Select(field => (string)field.GetRawConstantValue()!);
+        foreach (string code in codes)
+        {
+            string key = PolicyMessageKeys.ForValidation(code);
             Assert.True(neutral.ContainsKey(key), $"Missing neutral resource: {key}");
             Assert.True(korean.ContainsKey(key), $"Missing ko-KR resource: {key}");
         }

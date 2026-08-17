@@ -15,7 +15,8 @@ public sealed partial class MainViewModel(
     WorkspaceMonitorManager monitors,
     IFolderPicker folderPicker,
     IWorkspacePathLauncher pathLauncher,
-    ILocalizationService localization) : ViewModelBase, IAsyncDisposable
+    ILocalizationService localization,
+    ProtectionPolicyPanelViewModel policy) : ViewModelBase, IAsyncDisposable
 {
     private const int RecentObservationLimit = 100;
     private readonly CancellationTokenSource _lifetime = new();
@@ -23,6 +24,7 @@ public sealed partial class MainViewModel(
 
     public ObservableCollection<WorkspaceItemViewModel> Items { get; } = [];
     public ObservableCollection<WorkspaceObservationItemViewModel> RecentObservations { get; } = [];
+    public ProtectionPolicyPanelViewModel Policy { get; } = policy;
     public string AppTitle => localization.GetString("App.Title");
     public string WorkspaceTitle => localization.GetString("Workspace.Title");
     public string WorkspaceDescription => localization.GetString("Workspace.Description");
@@ -171,6 +173,7 @@ public sealed partial class MainViewModel(
             catch (OperationCanceledException) { }
         }
         _lifetime.Dispose();
+        await Policy.DisposeAsync();
         workspaces.Dispose();
     }
 }

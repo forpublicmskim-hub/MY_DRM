@@ -3,10 +3,10 @@
         xmlns:vm="using:Drm.Desktop.ViewModels"
         x:Class="Drm.Desktop.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Width="920" Height="600" MinWidth="720" MinHeight="460"
+        Width="1180" Height="700" MinWidth="900" MinHeight="560"
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding AppTitle}">
-  <Grid RowDefinitions="Auto,*,140,Auto,Auto" Margin="28" RowSpacing="16">
+  <Grid ColumnDefinitions="2*,*" RowDefinitions="Auto,*,140,Auto,Auto" Margin="28" RowSpacing="16" ColumnSpacing="18">
     <StackPanel Grid.Row="0" Spacing="6">
       <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding WorkspaceTitle}" />
       <TextBlock Foreground="Gray"
@@ -51,14 +51,67 @@
       </Border>
     </Grid>
 
-    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10">
+    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
+            BorderBrush="#60656D" BorderThickness="1" CornerRadius="8" Padding="16">
+      <ScrollViewer>
+        <StackPanel Spacing="10">
+          <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding Policy.Title}" />
+          <TextBlock Foreground="Gray" TextWrapping="Wrap" Text="{Binding Policy.Description}" />
+          <Button HorizontalAlignment="Left" Command="{Binding Policy.LoadPolicyCommand}"
+                  Content="{Binding Policy.LoadLabel}" />
+          <TextBlock TextWrapping="Wrap" Foreground="#D18A30" Text="{Binding Policy.StatusMessage}" />
+
+          <StackPanel IsVisible="{Binding Policy.Summary, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      Spacing="7" Margin="0,6,0,0">
+            <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding Policy.Summary.DisplayName}" />
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                  ColumnSpacing="10" RowSpacing="5">
+              <TextBlock Grid.Row="0" Text="{Binding Policy.NameLabel}" />
+              <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Policy.Summary.DisplayName}" TextWrapping="Wrap" />
+              <TextBlock Grid.Row="1" Text="{Binding Policy.IdLabel}" />
+              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Policy.Summary.PolicyId}" TextWrapping="Wrap" />
+              <TextBlock Grid.Row="2" Text="{Binding Policy.VersionLabel}" />
+              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Policy.Summary.PolicyVersion}" />
+              <TextBlock Grid.Row="3" Text="{Binding Policy.DocumentStateLabel}" />
+              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Policy.Summary.DocumentState}" />
+              <TextBlock Grid.Row="4" Text="{Binding Policy.TrustStateLabel}" />
+              <TextBlock Grid.Row="4" Grid.Column="1" Foreground="#D18A30"
+                         Text="{Binding Policy.Summary.TrustState}" TextWrapping="Wrap" />
+              <TextBlock Grid.Row="5" Text="{Binding Policy.EnforcementStateLabel}" />
+              <TextBlock Grid.Row="5" Grid.Column="1" Foreground="#D18A30"
+                         Text="{Binding Policy.Summary.EnforcementState}" />
+              <TextBlock Grid.Row="6" Text="{Binding Policy.IncludedLabel}" />
+              <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Policy.Summary.IncludedExtensions}" TextWrapping="Wrap" />
+              <TextBlock Grid.Row="7" Text="{Binding Policy.ExcludedLabel}" />
+              <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Policy.Summary.ExcludedExtensions}" TextWrapping="Wrap" />
+              <TextBlock Grid.Row="8" Text="{Binding Policy.MaximumSizeLabel}" />
+              <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding Policy.Summary.MaximumFileSize}" />
+              <TextBlock Grid.Row="9" Text="{Binding Policy.LoadedAtLabel}" />
+              <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Policy.Summary.LoadedAt}" />
+            </Grid>
+            <TextBlock FontWeight="SemiBold" Text="{Binding Policy.SourceLabel}" />
+            <TextBlock Text="{Binding Policy.Summary.SourceLocation}" TextWrapping="Wrap" />
+          </StackPanel>
+
+          <ItemsControl ItemsSource="{Binding Policy.ValidationErrors}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Foreground="#E07B7B" TextWrapping="Wrap" Text="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10">
       <Button Command="{Binding AddFolderCommand}" Content="{Binding AddFolderLabel}" />
       <Button Command="{Binding UnregisterCommand}" Content="{Binding UnregisterLabel}" />
       <Button Command="{Binding OpenPathCommand}" Content="{Binding OpenLocationLabel}" />
       <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding ActivityMessage}" />
     </StackPanel>
 
-    <Border Grid.Row="4" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+    <Border Grid.Row="4" Grid.ColumnSpan="2" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
             Background="#4A2525" CornerRadius="6" Padding="12">
       <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
     </Border>

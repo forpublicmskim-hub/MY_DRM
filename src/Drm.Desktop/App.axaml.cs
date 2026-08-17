@@ -34,9 +34,21 @@ public partial class App : Avalonia.Application
             LocalWorkspaceScanner scanner = new();
             WorkspaceMonitorManager monitors = new(
                 new FileSystemWatcherWorkspaceMonitorFactory(scanner));
+            PolicyTrustOptions policyTrust =
+#if DEBUG
+                PolicyTrustOptions.Development;
+#else
+                PolicyTrustOptions.Production;
+#endif
+            ProtectionPolicyLoader policyLoader = new(
+                new LocalFileProtectionPolicySource(), new SystemClock(), policyTrust);
+            ProtectionPolicyPanelViewModel policyPanel = new(
+                new ProtectionPolicyInspectionService(policyLoader),
+                new AvaloniaPolicyFilePicker(() => window, localization),
+                localization);
             window.DataContext = new MainViewModel(workspaceService, monitors,
                 new AvaloniaFolderPicker(() => window, localization), new LocalWorkspacePathLauncher(),
-                localization);
+                localization, policyPanel);
             desktop.MainWindow = window;
         }
 

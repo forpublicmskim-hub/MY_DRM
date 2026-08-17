@@ -7,6 +7,54 @@
   <data name="App.Title" xml:space="preserve"><value>DRM 작업공간</value></data>
   <data name="Language.English" xml:space="preserve"><value>영어</value></data>
   <data name="Language.Korean" xml:space="preserve"><value>한국어</value></data>
+  <data name="Policy.Inspection.Title" xml:space="preserve"><value>개발용 정책 검증</value></data>
+  <data name="Policy.Inspection.Description" xml:space="preserve"><value>서명되지 않은 Draft를 읽고 검증하여 표시만 합니다. 작업공간이나 파일에는 적용하지 않습니다.</value></data>
+  <data name="Policy.Inspection.Load" xml:space="preserve"><value>정책 불러오기</value></data>
+  <data name="Policy.Picker.Title" xml:space="preserve"><value>검증할 개발용 정책 선택</value></data>
+  <data name="Policy.Picker.FileType" xml:space="preserve"><value>JSON 정책</value></data>
+  <data name="Policy.Field.Name" xml:space="preserve"><value>정책 이름</value></data>
+  <data name="Policy.Field.Id" xml:space="preserve"><value>정책 ID</value></data>
+  <data name="Policy.Field.Version" xml:space="preserve"><value>정책 버전</value></data>
+  <data name="Policy.Field.IncludedExtensions" xml:space="preserve"><value>보호 대상 확장자</value></data>
+  <data name="Policy.Field.ExcludedExtensions" xml:space="preserve"><value>제외 확장자</value></data>
+  <data name="Policy.Field.MaximumSize" xml:space="preserve"><value>최대 파일 크기</value></data>
+  <data name="Policy.Field.Source" xml:space="preserve"><value>불러온 파일</value></data>
+  <data name="Policy.Field.LoadedAt" xml:space="preserve"><value>불러온 시각</value></data>
+  <data name="Policy.Field.DocumentState" xml:space="preserve"><value>문서 검증</value></data>
+  <data name="Policy.Field.TrustState" xml:space="preserve"><value>신뢰 상태</value></data>
+  <data name="Policy.Field.EnforcementState" xml:space="preserve"><value>집행 상태</value></data>
+  <data name="Policy.State.Document.Valid" xml:space="preserve"><value>검증 성공</value></data>
+  <data name="Policy.State.Trust.UnsignedDevelopmentDraft" xml:space="preserve"><value>서명되지 않은 개발용 Draft</value></data>
+  <data name="Policy.State.Enforcement.NotApplied" xml:space="preserve"><value>적용되지 않음</value></data>
+  <data name="Policy.Value.None" xml:space="preserve"><value>없음</value></data>
+  <data name="Policy.Value.NoLimit" xml:space="preserve"><value>제한 없음</value></data>
+  <data name="Policy.Status.NotLoaded" xml:space="preserve"><value>불러온 정책이 없습니다.</value></data>
+  <data name="Policy.Status.Loaded" xml:space="preserve"><value>표시용 검증에 성공했습니다. 이 unsigned Draft는 적용되지 않습니다.</value></data>
+  <data name="Policy.Status.NotFound" xml:space="preserve"><value>정책 파일을 찾을 수 없습니다.</value></data>
+  <data name="Policy.Status.AccessDenied" xml:space="preserve"><value>접근 권한이 없어 정책 파일을 읽을 수 없습니다.</value></data>
+  <data name="Policy.Status.Invalid" xml:space="preserve"><value>정책 문서가 올바르지 않습니다.</value></data>
+  <data name="Policy.Status.Unsupported" xml:space="preserve"><value>현재 DRM 클라이언트가 지원하지 않는 정책입니다. 클라이언트 호환성을 확인해 주세요.</value></data>
+  <data name="Policy.Status.TooLarge" xml:space="preserve"><value>정책 파일이 1 MiB 제한을 초과했습니다.</value></data>
+  <data name="Policy.Status.Untrusted" xml:space="preserve"><value>현재 모드에서는 서명되지 않은 정책을 신뢰하지 않습니다.</value></data>
+  <data name="Policy.Status.Unavailable" xml:space="preserve"><value>정책 파일을 일시적으로 읽을 수 없습니다.</value></data>
+  <data name="Policy.Status.PickerUnavailable" xml:space="preserve"><value>이 플랫폼에서는 정책 파일 선택 창을 사용할 수 없습니다.</value></data>
+  <data name="Policy.Validation.Required" xml:space="preserve"><value>필수 정책 값이 누락되었습니다.</value></data>
+  <data name="Policy.Validation.UnsupportedSchema" xml:space="preserve"><value>지원하지 않는 schemaVersion입니다.</value></data>
+  <data name="Policy.Validation.InvalidVersion" xml:space="preserve"><value>정책 버전이 올바르지 않습니다.</value></data>
+  <data name="Policy.Validation.InvalidExtension" xml:space="preserve"><value>올바르지 않은 확장자 형식이 있습니다.</value></data>
+  <data name="Policy.Validation.DuplicateExtension" xml:space="preserve"><value>중복된 확장자가 있습니다.</value></data>
+  <data name="Policy.Validation.ExtensionConflict" xml:space="preserve"><value>같은 확장자가 포함 및 제외 목록에 모두 있습니다.</value></data>
+  <data name="Policy.Validation.ProtectedExtension" xml:space="preserve"><value>보호 컨테이너 확장자는 포함할 수 없습니다.</value></data>
+  <data name="Policy.Validation.InvalidMaximumSize" xml:space="preserve"><value>최대 파일 크기가 올바르지 않습니다.</value></data>
+  <data name="Policy.Validation.InvalidValidityRange" xml:space="preserve"><value>정책 유효기간이 올바르지 않습니다.</value></data>
+  <data name="Policy.Validation.UnsupportedCapability" xml:space="preserve"><value>지원하지 않는 capability가 선언되었습니다.</value></data>
+  <data name="Policy.Validation.MissingCapability" xml:space="preserve"><value>정책 값에 필요한 capability가 누락되었습니다.</value></data>
+  <data name="Policy.Validation.UnexpectedCapability" xml:space="preserve"><value>정책 내용과 관계없는 capability가 선언되었습니다.</value></data>
+  <data name="Policy.Validation.ValueTooLong" xml:space="preserve"><value>허용 길이를 초과한 정책 값이 있습니다.</value></data>
+  <data name="Policy.Validation.TooManyValues" xml:space="preserve"><value>정책 목록의 허용 개수를 초과했습니다.</value></data>
+  <data name="Policy.Validation.DocumentTooLarge" xml:space="preserve"><value>정책 문서가 너무 큽니다.</value></data>
+  <data name="Policy.Validation.InvalidJson" xml:space="preserve"><value>올바른 정책 JSON이 아닙니다.</value></data>
+  <data name="Policy.Validation.PersistenceFailed" xml:space="preserve"><value>정책 저장 작업에 실패했습니다.</value></data>
   <data name="Workspace.Title" xml:space="preserve"><value>보호 작업공간</value></data>
   <data name="Workspace.Description" xml:space="preserve"><value>보호 대상으로 폴더를 등록합니다. 이 단계에서는 파일을 암호화하거나 변경하지 않습니다.</value></data>
   <data name="Workspace.Add" xml:space="preserve"><value>폴더 추가</value></data>

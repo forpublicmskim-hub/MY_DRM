@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Drm.Domain\Drm.Domain.csproj" />
+    <ProjectReference Include="..\Drm.Policy\Drm.Policy.csproj" />
     <ProjectReference Include="..\Drm.Platform.Abstractions\Drm.Platform.Abstractions.csproj" />
   </ItemGroup>
 

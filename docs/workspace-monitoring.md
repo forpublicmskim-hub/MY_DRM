@@ -14,6 +14,8 @@ Desktop 애플리케이션은 등록된 Workspace의 기존 항목을 스캔하�
 
 OS callback은 bounded channel에 빠르게 기록합니다. canonical Workspace 경계 밖 경로와 reparse point는 발행하지 않습니다. 등록 해제 시 해당 monitor를 중지하고 애플리케이션 종료 시 모든 monitor를 폐기합니다.
 
+Desktop 창 종료는 첫 close 요청을 잠시 보류하고 비동기 정리를 시작합니다. 정리 중 UI dispatcher는 계속 실행되므로 이미 queue에 들어간 관찰 callback과 monitor 종료가 서로 기다리는 교착을 만들지 않습니다. 정리가 성공하거나 오류로 끝나면 두 번째 close 요청으로 실제 창을 닫으며, 중복 close 요청은 하나의 정리 task를 공유합니다.
+
 감시 상태와 관찰 종류는 Application enum으로 전달하고 Desktop에서 `ILocalizationService`를 통해 표시합니다. 영어 중립 리소스와 `ko-KR` 리소스는 동일한 감시 키 계약을 제공하며, Application과 Platform 계층에는 사용자 문구를 두지 않습니다.
 
 ## 현재 제한 사항

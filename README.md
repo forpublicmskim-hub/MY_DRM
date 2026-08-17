@@ -124,6 +124,8 @@ dotnet run --project src/Drm.Desktop/Drm.Desktop.csproj
 
 작업공간 목록은 사용자별 로컬 애플리케이션 데이터 디렉터리의 `Drm/workspaces.json`에 저장됩니다. Windows의 기본 위치는 `%LOCALAPPDATA%\Drm\workspaces.json`입니다. 이 Registry에는 비밀번호, 인증 token 또는 암호화 key를 저장하지 않습니다.
 
+창을 닫으면 Workspace monitor와 정책 inspection 작업을 비동기로 정리한 뒤 Desktop 프로세스가 종료됩니다. UI thread를 동기 대기로 막지 않으므로 정상 종료 후 dotnet run을 실행한 terminal prompt가 다시 표시됩니다.
+
 ## Policy Maker 실행
 
 ```powershell

@@ -12,6 +12,8 @@
 - 등록 해제와 Desktop 종료 시 monitor를 정리합니다.
 - 감시 상태와 관찰 종류의 사용자 문구를 영어 중립 및 한국어 위성 RESX 리소스로 제공하도록 localization 기반과 통합했습니다.
 - 초기 스캔, 파일 생성, 중지 경로의 통합 테스트를 추가했습니다.
+- Desktop OnClosed의 동기 DisposeAsync 대기를 제거하고 비동기 close coordinator로 교체했습니다.
+- 중복 종료 요청은 하나의 정리 task를 공유하며, 정리 오류가 발생해도 창 종료는 완료하도록 했습니다.
 
 ## 설계
 
@@ -28,6 +30,8 @@ Application과 Platform 계층은 culture와 사용자 문구를 알지 않으�
 - 실행 중인 Debug Desktop과 출력 파일 충돌을 피하기 위해 `dotnet build Drm.slnx -c Release --no-restore`를 실행했으며 경고 0개, 오류 0개로 통과했습니다.
 - 기존 라이프사이클 테스트 9개와 localization 및 감시 통합을 포함한 Workspace 테스트 36개가 모두 통과했습니다.
 - Workspace 감시 테스트는 초기 스캔, 파일 생성, 이름 변경의 이전 경로 보존 및 중지 후 상태를 검증합니다.
+- 종료 coordinator의 비동기 완료·중복 요청·실패 경로 테스트를 포함한 Workspace 테스트 48개가 통과했습니다.
+- Release Desktop을 dotnet run으로 시작한 뒤 정상 창 닫기를 수행했으며 Desktop과 부모 dotnet 프로세스가 모두 종료되고 exit code 0을 반환했습니다.
 
 ## 관련 문서
 

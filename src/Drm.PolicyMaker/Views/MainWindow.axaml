@@ -43,33 +43,21 @@
             <TextBlock Margin="0,6,0,0" Text="유효 시작 UTC" FontWeight="SemiBold" />
             <TextBlock Foreground="{DynamicResource AppTextSecondaryBrush}"
                        Text="아래 날짜와 시간을 UTC 기준으로 저장합니다." />
-            <Grid ColumnDefinitions="*,140,52" ColumnSpacing="8">
+            <Grid ColumnDefinitions="*,220" ColumnSpacing="8">
               <CalendarDatePicker Grid.Column="0" SelectedDate="{Binding ValidFromDate}"
                                   PlaceholderText="시작 날짜 선택" />
               <TimePicker Grid.Column="1" SelectedTime="{Binding ValidFromTime}"
                           ClockIdentifier="24HourClock" />
-              <Border Grid.Column="2" Background="{DynamicResource AppAccentSurfaceBrush}"
-                      BorderBrush="{DynamicResource AppAccentBrush}" BorderThickness="1"
-                      CornerRadius="5" Padding="7,4">
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Foreground="{DynamicResource AppAccentBrush}" FontWeight="SemiBold" Text="UTC" />
-              </Border>
             </Grid>
 
             <TextBlock Margin="0,4,0,0" Text="유효 종료 UTC" FontWeight="SemiBold" />
             <TextBlock Foreground="{DynamicResource AppTextSecondaryBrush}"
                        Text="종료 제한이 없으면 날짜를 선택하지 마세요." />
-            <Grid ColumnDefinitions="*,140,52" ColumnSpacing="8">
+            <Grid ColumnDefinitions="*,220" ColumnSpacing="8">
               <CalendarDatePicker Grid.Column="0" SelectedDate="{Binding ValidUntilDate}"
                                   PlaceholderText="종료 날짜 선택" />
               <TimePicker Grid.Column="1" SelectedTime="{Binding ValidUntilTime}"
                           ClockIdentifier="24HourClock" />
-              <Border Grid.Column="2" Background="{DynamicResource AppAccentSurfaceBrush}"
-                      BorderBrush="{DynamicResource AppAccentBrush}" BorderThickness="1"
-                      CornerRadius="5" Padding="7,4">
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Foreground="{DynamicResource AppAccentBrush}" FontWeight="SemiBold" Text="UTC" />
-              </Border>
             </Grid>
 
             <TextBlock Margin="0,8,0,0" FontWeight="SemiBold" Text="검증 결과" />

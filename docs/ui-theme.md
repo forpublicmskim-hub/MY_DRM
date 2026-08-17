@@ -15,6 +15,6 @@ Drm.Desktop과 Drm.PolicyMaker는 어두운 화면에서도 영역과 상태를 
 
 두 실행 파일은 같은 resource key 계약을 가지며 각 App.axaml에서 Dark theme variant를 명시합니다. 화면 XAML은 의미를 가진 brush resource를 참조하고 개별 색상값을 직접 선택하지 않습니다.
 
-버튼은 기본, pointer over, pressed 상태를 서로 다른 표면색과 테두리로 구분합니다. 스크롤바는 surface와 border 색을 명시해 긴 입력 및 JSON 미리보기에서 위치를 식별할 수 있게 합니다. Desktop의 선택된 Workspace와 Policy Maker의 날짜 UTC 표시는 accent 계열을 사용합니다. 경고와 오류는 색상만으로 구분하지 않고 기존 문구 및 영역 구조를 함께 유지합니다.
+버튼은 기본, pointer over, pressed 상태를 서로 다른 표면색과 테두리로 구분합니다. 스크롤바는 surface와 border 색을 명시해 긴 입력 및 JSON 미리보기에서 위치를 식별할 수 있게 합니다. Desktop의 선택된 Workspace와 주요 정보 표시는 accent 계열을 사용합니다. Policy Maker의 UTC 기준은 날짜 섹션 제목과 설명에 표시하고 TimePicker에는 시·분 필드가 잘리지 않는 폭을 제공합니다. 경고와 오류는 색상만으로 구분하지 않고 기존 문구 및 영역 구조를 함께 유지합니다.
 
 현재 UI는 사용자 지정 테마와 Light theme 전환을 제공하지 않습니다.

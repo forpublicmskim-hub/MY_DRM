@@ -12,6 +12,7 @@ DRM Desktop과 Policy Maker의 검은색 위주 화면을 navy-charcoal 기반�
 - 버튼의 기본, pointer over, pressed 상태와 Workspace 선택 상태를 구분했습니다.
 - 보조 설명, 감시 상태, unsigned 경고, 검증 오류를 의미색으로 통일했습니다.
 - Policy Maker XAML에 남아 있던 깨진 한국어 문구를 복원했습니다.
+- Policy Maker의 별도 UTC 배지가 TimePicker 내부 필드를 가리던 레이아웃을 제거하고 시·분 입력에 충분한 폭을 배정했습니다.
 
 ## Design
 

@@ -105,7 +105,7 @@ public sealed partial class ProtectionPolicyPanelViewModel(
 }
 
 public sealed class ProtectionPolicySummaryViewModel(
-    ProtectionPolicySnapshot snapshot,
+    InspectedProtectionPolicy snapshot,
     ILocalizationService localization)
 {
     private readonly EffectiveProtectionPolicy _policy = snapshot.Policy;

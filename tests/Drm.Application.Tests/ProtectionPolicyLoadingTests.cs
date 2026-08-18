@@ -23,6 +23,45 @@ public sealed class ProtectionPolicyLoadingTests
         Assert.Contains(".pdf", result.Snapshot.Policy.IncludedExtensions);
         Assert.Equal(Now, result.Snapshot.LoadedAtUtc);
         Assert.Equal(ProtectionPolicyTrustState.UnsignedDevelopmentDraft, result.Snapshot.TrustState);
+        Assert.Equal(draft.PolicyId, result.Snapshot.Identity.PolicyId);
+        Assert.Equal(draft.PolicyVersion, result.Snapshot.Identity.PolicyVersion);
+        Assert.Matches("^[0-9a-f]{64}$", result.Snapshot.Identity.ContentDigest);
+    }
+
+    [Fact]
+    public async Task CanonicalPolicyDigestIsStableAndDistinguishesChangedPayload()
+    {
+        ProtectionPolicyDraft firstDraft = ValidDraft();
+        ProtectionPolicyDocument firstDocument = PolicyNormalizer.Normalize(firstDraft);
+        string firstJson = ProtectionPolicySerializer.Serialize(firstDocument);
+        ProtectionPolicyLoader firstLoader = CreateLoader(
+            ProtectionPolicySourceReadResult.Success(firstJson), PolicyTrustOptions.Development);
+        ProtectionPolicyLoader equivalentLoader = CreateLoader(
+            ProtectionPolicySourceReadResult.Success(firstJson.ReplaceLineEndings("\r\n")),
+            PolicyTrustOptions.Development);
+
+        ProtectionPolicyDraft changedDraft = ValidDraft();
+        changedDraft.PolicyId = firstDraft.PolicyId;
+        changedDraft.PolicyVersion = firstDraft.PolicyVersion;
+        changedDraft.IncludedExtensions.Add(".docx");
+        ProtectionPolicyLoader changedLoader = CreateLoader(
+            ProtectionPolicySourceReadResult.Success(
+                ProtectionPolicySerializer.Serialize(PolicyNormalizer.Normalize(changedDraft))),
+            PolicyTrustOptions.Development);
+
+        ProtectionPolicyLoadResult first = await firstLoader.LoadAsync("first.json");
+        ProtectionPolicyLoadResult equivalent = await equivalentLoader.LoadAsync("equivalent.json");
+        ProtectionPolicyLoadResult changed = await changedLoader.LoadAsync("changed.json");
+
+        Assert.Equal(first.Snapshot!.Identity.ContentDigest, equivalent.Snapshot!.Identity.ContentDigest);
+        Assert.NotEqual(first.Snapshot.Identity.ContentDigest, changed.Snapshot!.Identity.ContentDigest);
+    }
+
+    [Fact]
+    public void EnforceablePolicyCannotBeCreatedByAnUntrustedCaller()
+    {
+        Assert.Empty(typeof(EnforceableProtectionPolicy).GetConstructors());
+        Assert.Empty(typeof(VerifiedPolicyIdentity).GetConstructors());
     }
 
     [Fact]

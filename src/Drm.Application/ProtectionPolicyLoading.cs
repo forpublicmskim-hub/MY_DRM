@@ -1,4 +1,6 @@
 using Drm.Policy;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Drm.Application;
 
@@ -50,15 +52,47 @@ public sealed record PolicyTrustOptions(bool AllowUnsignedDevelopmentPolicies)
     public static PolicyTrustOptions Development { get; } = new(true);
 }
 
-public sealed record ProtectionPolicySnapshot(
+public sealed record PolicySnapshotIdentity(
+    Guid PolicyId,
+    int PolicyVersion,
+    string ContentDigest);
+
+public sealed record InspectedProtectionPolicy(
     EffectiveProtectionPolicy Policy,
+    PolicySnapshotIdentity Identity,
     string SourceLocation,
     DateTimeOffset LoadedAtUtc,
     ProtectionPolicyTrustState TrustState);
 
+public sealed record VerifiedPolicyIdentity
+{
+    internal VerifiedPolicyIdentity(PolicySnapshotIdentity snapshot, string issuer)
+    {
+        Snapshot = snapshot;
+        Issuer = issuer;
+    }
+
+    public PolicySnapshotIdentity Snapshot { get; }
+    public string Issuer { get; }
+}
+
+public sealed record EnforceableProtectionPolicy
+{
+    internal EnforceableProtectionPolicy(
+        EffectiveProtectionPolicy policy,
+        VerifiedPolicyIdentity identity)
+    {
+        Policy = policy;
+        Identity = identity;
+    }
+
+    public EffectiveProtectionPolicy Policy { get; }
+    public VerifiedPolicyIdentity Identity { get; }
+}
+
 public sealed record ProtectionPolicyLoadResult(
     ProtectionPolicyLoadStatus Status,
-    ProtectionPolicySnapshot? Snapshot,
+    InspectedProtectionPolicy? Snapshot,
     IReadOnlyList<PolicyValidationError> Errors)
 {
     public bool IsLoaded => Status == ProtectionPolicyLoadStatus.Loaded && Snapshot is not null;
@@ -94,9 +128,11 @@ public sealed class ProtectionPolicyLoader(
 
         try
         {
-            EffectiveProtectionPolicy policy = PolicyNormalizer.Compile(loaded.Document!);
-            ProtectionPolicySnapshot snapshot = new(
-                policy, location, clock.UtcNow, ProtectionPolicyTrustState.UnsignedDevelopmentDraft);
+            ProtectionPolicyDocument document = loaded.Document!;
+            EffectiveProtectionPolicy policy = PolicyNormalizer.Compile(document);
+            PolicySnapshotIdentity identity = CreateIdentity(document);
+            InspectedProtectionPolicy snapshot = new(
+                policy, identity, location, clock.UtcNow, ProtectionPolicyTrustState.UnsignedDevelopmentDraft);
             return new ProtectionPolicyLoadResult(
                 ProtectionPolicyLoadStatus.Loaded, snapshot, Array.Empty<PolicyValidationError>());
         }
@@ -104,6 +140,16 @@ public sealed class ProtectionPolicyLoader(
         {
             return ValidationFailure(exception.Validation.Errors);
         }
+    }
+
+    private static PolicySnapshotIdentity CreateIdentity(ProtectionPolicyDocument document)
+    {
+        string canonicalPayload = ProtectionPolicySerializer.Serialize(document);
+        byte[] digest = SHA256.HashData(Encoding.UTF8.GetBytes(canonicalPayload));
+        return new PolicySnapshotIdentity(
+            document.PolicyId,
+            document.PolicyVersion,
+            Convert.ToHexStringLower(digest));
     }
 
     private static ProtectionPolicyLoadResult SourceFailure(PolicySourceReadStatus status) => new(
@@ -127,12 +173,19 @@ public sealed class ProtectionPolicyLoader(
         errors);
 }
 
-public sealed class ProtectionPolicyInspectionService(ProtectionPolicyLoader loader) : IDisposable
+public interface ICurrentProtectionPolicyProvider
+{
+    InspectedProtectionPolicy? Current { get; }
+}
+
+public sealed class ProtectionPolicyInspectionService(ProtectionPolicyLoader loader)
+    : ICurrentProtectionPolicyProvider, IDisposable
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private InspectedProtectionPolicy? _current;
     private bool _disposed;
 
-    public ProtectionPolicySnapshot? Current { get; private set; }
+    public InspectedProtectionPolicy? Current => Volatile.Read(ref _current);
 
     public async ValueTask<ProtectionPolicyLoadResult> LoadAsync(
         string location,
@@ -145,7 +198,7 @@ public sealed class ProtectionPolicyInspectionService(ProtectionPolicyLoader loa
             ProtectionPolicyLoadResult result = await loader.LoadAsync(location, cancellationToken)
                 .ConfigureAwait(false);
             if (result.IsLoaded)
-                Current = result.Snapshot;
+                Volatile.Write(ref _current, result.Snapshot);
             return result;
         }
         finally

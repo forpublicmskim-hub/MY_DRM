@@ -5,13 +5,27 @@
 보호 후보 흐름은 파일을 변경하지 않는 inspection 전용 기반입니다.
 
     WorkspaceMonitorEvent
-      -> ProtectionCandidateCollector
-      -> IProtectionCandidateMetadataReader
-      -> ProtectionCandidate
-      -> ProtectionCandidateEvaluator
-      -> ProtectionCandidateDecision
+      -> ProtectionCandidateInspectionProcessor
+         -> ProtectionCandidateCollector
+         -> IProtectionCandidateMetadataReader
+         -> ICurrentProtectionPolicyProvider
+         -> ProtectionCandidateEvaluator
+      -> ProtectionCandidateInspectionResult
 
-현재 collector와 evaluator는 runtime monitor에 연결되지 않았으며, queue 등록·키 처리·암호화를 수행하지 않습니다.
+현재 processor는 사건 하나를 처리하는 Application use case로만 구현되어 있습니다. runtime monitor stream에는 연결되지 않았으며 queue 등록·키 처리·암호화를 수행하지 않습니다.
+
+## inspection processor
+
+ProtectionCandidateInspectionProcessor는 collection 결과가 Collected일 때만 현재 inspection 정책 snapshot을 한 번 읽고 평가합니다.
+
+- 정책이 있으면 항상 PolicyUsageMode.Inspection으로 평가합니다.
+- 정책이 없으면 후보를 버린 것으로 숨기지 않고 policy.not-loaded를 남깁니다.
+- Ignored, Deferred, Rejected collection 결과에서는 정책 provider를 읽지 않습니다.
+- IClock.UtcNow를 평가 context에 전달하며 processor가 시스템 시각을 직접 조회하지 않습니다.
+
+ProtectionCandidateInspectionResult는 별도 상태 enum을 중복 저장하지 않습니다. Decision 존재 여부로 평가 완료를 판단하고, 평가하지 않은 경우 SkipReasonCode에 collection reason 또는 policy.not-loaded를 보존합니다. factory는 Collected 후보와 Decision의 Workspace·상대 경로가 일치하도록 불변식을 검사합니다.
+
+정책이 나중에 로드돼도 policy.not-loaded 결과가 자동 재평가되지는 않습니다. 향후 정책 변경을 관찰하는 pipeline과 전체 Workspace 재평가 scan이 필요합니다.
 
 ## 후보 수집 경계
 

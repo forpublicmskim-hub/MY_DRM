@@ -166,6 +166,7 @@ History/                      주요 변경의 배경과 설계 이력
 ## 관련 문서
 
 - [아키텍처](docs/architecture.md)
+- [아키텍처 실행 흐름](docs/architecture-flows.md)
 - [작업공간 등록](docs/workspace-registration.md)
 - [Workspace 파일 감시](docs/workspace-monitoring.md)
 - [Policy Maker 및 정책 Draft](docs/policy-maker.md)

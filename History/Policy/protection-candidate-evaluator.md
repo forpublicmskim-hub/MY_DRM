@@ -16,6 +16,11 @@ Workspace 관찰 이벤트를 완전한 파일 후보 snapshot으로 변환하�
 - ProtectionCandidateInspectionProcessor가 collection 성공 결과와 현재 inspection 정책 snapshot을 연결합니다.
 - 정책 없음은 policy.not-loaded로 보존하고 collection 실패에서는 정책 provider를 읽지 않습니다.
 - inspection 결과 factory가 collection, decision과 후보 identity 조합의 불변식을 검사합니다.
+- ProtectionInspectionPipeline을 WorkspaceMonitorManager stream의 유일한 consumer로 연결했습니다.
+- pipeline이 활성 Workspace snapshot을 소유하고 event마다 ProtectionCandidateInspectionProcessor를 순차 호출하도록 구현했습니다.
+- monitor 정보와 inspection 결과를 integrated result로 결합하여 Desktop에 전달하도록 연결했습니다.
+- 개별 event의 예상하지 못한 실패를 ProcessingFailed로 격리하여 이후 event 처리를 계속하도록 구현했습니다.
+- manager와 pipeline channel이 출력을 조용히 폐기하지 않도록 하고, local saturation 시 reconciliation을 요청하도록 구현했습니다.
 
 ## Design
 
@@ -23,14 +28,16 @@ Application collector는 파일 시스템을 알지 않고 Local adapter는 정�
 
 FileVersionStamp는 안정화 보조 정보일 뿐 보안 identity가 아닙니다. FileSystemWatcher 이벤트도 source of truth가 아니므로 실제 보호 작업 전에는 inventory reconciliation과 handle 기반 재검증이 필요합니다.
 
+pipeline은 monitor stream의 단일 소비 지점에서 활성 Workspace snapshot, 순차 처리와 Desktop 전달을 관리합니다. event별 예상하지 못한 실패는 `ProcessingFailed`로 표현하며 stream 전체의 실패로 확산시키지 않습니다. channel 포화 시에는 조용한 drop 대신 reconciliation을 요청하지만, 이 요청은 durable queue나 개별 event retry를 대체하지 않습니다.
+
 ## Impact
 
-Desktop UI와 monitor runtime 흐름은 변경되지 않았습니다. 정책이 나중에 로드될 때 기존 파일을 자동 재평가하는 pipeline, queue, 암호화, 키 처리와 Workspace 정책 binding도 아직 추가되지 않았습니다.
+monitor runtime, inspection pipeline과 Desktop 결과 흐름이 연결되었습니다. 현재도 정책이 나중에 load될 때 기존 파일을 자동 재평가하지 않으며 파일 안정성 확인, 자동 retry, durable queue와 암호화는 제공하지 않습니다. 따라서 integrated result는 inspection 결과이며 보호 집행 또는 보호 완료를 의미하지 않습니다.
 
 ## Validation
 
-- Application 단위 테스트 64개 통과
-- Workspace 및 Local adapter Release 테스트 56개 통과
+- Application 테스트 70개 통과
+- Workspaces 테스트 62개 통과
 - Local platform 프로젝트 build 통과
 - 정상 파일, 디렉터리, 확장자 없음, 대소문자 정규화, missing 파일, rooted 경로, 상위 경로 탈출과 취소 경로 검증
 - 평가 완료, 정책 없음, collection 미완료, 정책 비활성, snapshot 단일 읽기와 결과 불변식 검증

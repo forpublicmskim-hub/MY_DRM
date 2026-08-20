@@ -63,16 +63,27 @@ public interface IWorkspaceMonitorFactory
     IWorkspaceMonitor Create(ProtectedWorkspace workspace);
 }
 
-public sealed class WorkspaceMonitorManager(IWorkspaceMonitorFactory factory) : IAsyncDisposable
+public interface IWorkspaceMonitorCoordinator : IAsyncDisposable
+{
+    ValueTask ReconcileAsync(
+        IReadOnlyCollection<ProtectedWorkspace> workspaces,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<WorkspaceMonitorEvent> ObserveAsync(
+        CancellationToken cancellationToken = default);
+}
+
+public sealed class WorkspaceMonitorManager(IWorkspaceMonitorFactory factory)
+    : IWorkspaceMonitorCoordinator
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly Dictionary<WorkspaceId, MonitorRegistration> _registrations = [];
     private readonly Channel<WorkspaceMonitorEvent> _events = Channel.CreateBounded<WorkspaceMonitorEvent>(
         new BoundedChannelOptions(1024)
         {
-            SingleReader = false,
+            SingleReader = true,
             SingleWriter = false,
-            FullMode = BoundedChannelFullMode.DropOldest
+            FullMode = BoundedChannelFullMode.Wait
         });
     private bool _disposed;
 
@@ -140,7 +151,7 @@ public sealed class WorkspaceMonitorManager(IWorkspaceMonitorFactory factory) : 
         try
         {
             await foreach (WorkspaceMonitorEvent item in monitor.ObserveAsync(cancellationToken).ConfigureAwait(false))
-                _events.Writer.TryWrite(item);
+                await _events.Writer.WriteAsync(item, cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }

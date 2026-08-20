@@ -103,3 +103,59 @@ public static class PolicyMessageKeys
         _ => "Common.UnexpectedError"
     };
 }
+
+public static class ProtectionCandidateMessageKeys
+{
+    public static string ForCollectionStatus(ProtectionCandidateCollectionStatus status) => status switch
+    {
+        ProtectionCandidateCollectionStatus.Collected => "Inspection.Collection.Collected",
+        ProtectionCandidateCollectionStatus.Ignored => "Inspection.Collection.Ignored",
+        ProtectionCandidateCollectionStatus.Deferred => "Inspection.Collection.Deferred",
+        ProtectionCandidateCollectionStatus.Rejected => "Inspection.Collection.Rejected",
+        _ => "Common.UnexpectedError"
+    };
+
+    public static string ForEvaluationOutcome(ProtectionEvaluationOutcome outcome) => outcome switch
+    {
+        ProtectionEvaluationOutcome.Eligible => "Inspection.Evaluation.Eligible",
+        ProtectionEvaluationOutcome.Excluded => "Inspection.Evaluation.Excluded",
+        ProtectionEvaluationOutcome.Deferred => "Inspection.Evaluation.Deferred",
+        ProtectionEvaluationOutcome.PolicyInactive => "Inspection.Evaluation.PolicyInactive",
+        ProtectionEvaluationOutcome.Indeterminate => "Inspection.Evaluation.Indeterminate",
+        _ => "Common.UnexpectedError"
+    };
+
+    public static string ForReason(string? code) => code switch
+    {
+        ProtectionCandidateCollectionReasonCodes.Collected => "Inspection.Reason.Collected",
+        ProtectionCandidateCollectionReasonCodes.Deleted => "Inspection.Reason.Deleted",
+        ProtectionCandidateCollectionReasonCodes.UnsupportedObservation => "Inspection.Reason.UnsupportedObservation",
+        ProtectionCandidateCollectionReasonCodes.WorkspaceMismatch => "Inspection.Reason.WorkspaceMismatch",
+        ProtectionCandidateCollectionReasonCodes.NotFound => "Inspection.Reason.NotFound",
+        ProtectionCandidateCollectionReasonCodes.AccessDenied => "Inspection.Reason.AccessDenied",
+        ProtectionCandidateCollectionReasonCodes.FileUnstable => "Inspection.Reason.FileUnstable",
+        ProtectionCandidateCollectionReasonCodes.UnsafePath => "Inspection.Reason.UnsafePath",
+        ProtectionCandidateCollectionReasonCodes.SymbolicLink => "Inspection.Reason.SymbolicLink",
+        ProtectionCandidateCollectionReasonCodes.Unavailable => "Inspection.Reason.Unavailable",
+        ProtectionCandidateCollectionReasonCodes.AgeUnknown => "Inspection.Reason.AgeUnknown",
+        ProtectionCandidateInspectionReasonCodes.PolicyNotLoaded => "Inspection.Reason.PolicyNotLoaded",
+        ProtectionCandidateReasonCodes.Eligible => "Inspection.Reason.Eligible",
+        ProtectionCandidateReasonCodes.PolicyNotEnforceable => "Inspection.Reason.PolicyNotEnforceable",
+        ProtectionCandidateReasonCodes.PolicyIdentityInvalid => "Inspection.Reason.PolicyIdentityInvalid",
+        ProtectionCandidateReasonCodes.PolicyDisabled => "Inspection.Reason.PolicyDisabled",
+        ProtectionCandidateReasonCodes.PolicyNotYetValid => "Inspection.Reason.PolicyNotYetValid",
+        ProtectionCandidateReasonCodes.PolicyExpired => "Inspection.Reason.PolicyExpired",
+        ProtectionCandidateReasonCodes.Directory => "Inspection.Reason.Directory",
+        ProtectionCandidateReasonCodes.AgeDisabled => "Inspection.Reason.AgeDisabled",
+        ProtectionCandidateReasonCodes.ExtensionExcluded => "Inspection.Reason.ExtensionExcluded",
+        ProtectionCandidateReasonCodes.ExtensionNotIncluded => "Inspection.Reason.ExtensionNotIncluded",
+        ProtectionCandidateReasonCodes.FileTooLarge => "Inspection.Reason.FileTooLarge",
+        ProtectionCandidateReasonCodes.MetadataUnavailable => "Inspection.Reason.MetadataUnavailable",
+        ProtectionCandidateReasonCodes.MetadataInvalid => "Inspection.Reason.MetadataInvalid",
+        ProtectionCandidateReasonCodes.FileUnstable => "Inspection.Reason.FileUnstable",
+        ProtectionInspectionPipelineReasonCodes.MonitorOnly => "Inspection.Reason.MonitorOnly",
+        ProtectionInspectionPipelineReasonCodes.WorkspaceUnavailable => "Inspection.Reason.WorkspaceUnavailable",
+        ProtectionInspectionPipelineReasonCodes.ProcessingFailed => "Inspection.Reason.ProcessingFailed",
+        _ => "Common.UnexpectedError"
+    };
+}

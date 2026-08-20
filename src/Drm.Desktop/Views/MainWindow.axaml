@@ -39,11 +39,14 @@
         <ListBox ItemsSource="{Binding RecentObservations}">
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:WorkspaceObservationItemViewModel">
-              <Grid ColumnDefinitions="100,100,*,Auto" Margin="6,3">
+              <Grid ColumnDefinitions="80,90,2*,110,110,2*,Auto" ColumnSpacing="8" Margin="6,3">
                 <TextBlock Grid.Column="0" Text="{Binding ObservedAt}" />
                 <TextBlock Grid.Column="1" Text="{Binding Kind}" />
                 <TextBlock Grid.Column="2" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Grid.Column="3" Text="{Binding WorkspaceName}" Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                <TextBlock Grid.Column="3" Text="{Binding CollectionStatus}" />
+                <TextBlock Grid.Column="4" Text="{Binding EvaluationStatus}" />
+                <TextBlock Grid.Column="5" Text="{Binding Reason}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="6" Text="{Binding WorkspaceName}" Foreground="{DynamicResource AppTextSecondaryBrush}" />
               </Grid>
             </DataTemplate>
           </ListBox.ItemTemplate>

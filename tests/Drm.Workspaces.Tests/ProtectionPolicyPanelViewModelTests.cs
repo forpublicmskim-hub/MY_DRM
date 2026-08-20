@@ -57,6 +57,25 @@ public sealed class ProtectionPolicyPanelViewModelTests
         Assert.Null(viewModel.Summary);
     }
 
+    [Fact]
+    public async Task DisposingPanelDoesNotDisposeSharedPolicyService()
+    {
+        string json = CreatePolicyJson("Shared Policy");
+        QueueSource source = new(ProtectionPolicySourceReadResult.Success(json));
+        ProtectionPolicyInspectionService policies = new(
+            new ProtectionPolicyLoader(source, new FixedClock(), PolicyTrustOptions.Development));
+        ProtectionPolicyPanelViewModel viewModel = new(
+            policies,
+            new QueuePicker(),
+            new KeyLocalizationService());
+
+        await viewModel.DisposeAsync();
+        ProtectionPolicyLoadResult result = await policies.LoadAsync("policy.json");
+
+        Assert.True(result.IsLoaded);
+        policies.Dispose();
+    }
+
     private static ProtectionPolicyPanelViewModel CreateViewModel(
         IPolicyFilePicker picker,
         IProtectionPolicySource source)

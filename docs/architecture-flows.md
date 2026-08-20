@@ -11,6 +11,8 @@ sequenceDiagram
     participant Service as WorkspaceService
     participant Registry as JsonWorkspaceRegistry
     participant Monitor as WorkspaceMonitorManager
+    participant Pipeline as ProtectionInspectionPipeline
+    participant Processor as ProtectionCandidateInspectionProcessor
     participant Local as Local scanner / FileSystemWatcher
     participant FS as 로컬 파일 시스템
 
@@ -26,12 +28,15 @@ sequenceDiagram
     FS-->>Local: 현재 항목
     Local-->>Monitor: Existing 관찰
     Local-->>Monitor: Created / Modified / Deleted / Renamed 힌트
-    Monitor-->>UI: 상태와 최근 관찰
+    Monitor-->>Pipeline: WorkspaceMonitorEvent
+    Pipeline->>Processor: 활성 Workspace snapshot으로 순차 처리
+    Processor-->>Pipeline: ProtectionCandidateInspectionResult
+    Pipeline-->>UI: integrated result
 ```
 
 등록은 Workspace metadata만 저장하며 실제 폴더나 파일을 변경하지 않습니다. 초기 scan은 현재 inventory를 만들고 `FileSystemWatcher`는 이후 변화를 빠르게 알리는 힌트입니다. watcher 오류나 channel 포화가 발생하면 `Degraded`로 전환하고 재스캔하여 상태를 조정합니다.
 
-`WorkspaceMonitorManager`의 channel은 broadcast가 아니므로 향후 후보 inspection pipeline을 연결할 때는 단일 consumer가 관찰을 받아 UI와 후속 처리로 명시적으로 fan-out해야 합니다.
+`ProtectionInspectionPipeline`은 broadcast가 아닌 `WorkspaceMonitorManager` stream의 유일한 consumer이며 활성 Workspace snapshot을 소유합니다. manager와 pipeline의 channel은 출력을 조용히 폐기하지 않습니다. 로컬 channel이 포화되면 reconciliation을 요청하여 누락 가능성이 있는 관찰을 권위 있는 inventory scan으로 보정합니다.
 
 ## 정책 작성과 inspection
 
@@ -68,6 +73,8 @@ snapshot의 SHA-256 digest는 로컬 내용 식별자이지 전자서명이나 �
 ```mermaid
 flowchart TB
     Event["WorkspaceMonitorEvent"]
+    Pipeline["ProtectionInspectionPipeline<br/>sole stream consumer"]
+    Workspace["Active workspace snapshot"]
     Processor["ProtectionCandidateInspectionProcessor"]
     Collector["ProtectionCandidateCollector"]
     Reader["IProtectionCandidateMetadataReader"]
@@ -77,8 +84,12 @@ flowchart TB
     Policy["InspectedProtectionPolicy"]
     Evaluator["ProtectionCandidateEvaluator"]
     Result["ProtectionCandidateInspectionResult"]
+    Integrated["Integrated result / ProcessingFailed"]
+    Desktop["Drm.Desktop"]
 
-    Event --> Processor
+    Event --> Pipeline
+    Workspace --> Pipeline
+    Pipeline -->|"sequential"| Processor
     Processor --> Collector
     Collector --> Reader
     Reader --> LocalReader
@@ -91,17 +102,21 @@ flowchart TB
     Policy --> Evaluator
     Evaluator --> Result
     Processor --> Result
+    Result --> Pipeline
+    Pipeline --> Integrated --> Desktop
 ```
 
-processor는 다음 순서를 보장합니다.
+pipeline과 processor는 다음 순서를 보장합니다.
 
-1. 관찰이 후보 수집 대상인지 판단합니다. `Deleted`는 무시하고 age를 확정할 수 없는 `Modified`·`Renamed`는 재평가 대상으로 미룹니다.
-2. Local reader가 Workspace 탈출, rooted 경로와 reparse point를 거부하고 파일 종류·확장자·크기·version stamp를 수집합니다.
-3. 완전한 후보가 만들어졌을 때만 현재 정책 snapshot을 정확히 한 번 읽습니다.
-4. 정책이 있으면 항상 `Inspection` mode로 순수 evaluator를 호출합니다.
-5. 정책이 없거나 수집이 완료되지 않으면 구조화된 reason code를 보존하며 임의로 성공·제외로 바꾸지 않습니다.
+1. pipeline이 활성 Workspace snapshot에서 event의 Workspace를 확인하고 event를 하나씩 순차 처리합니다.
+2. processor가 관찰이 후보 수집 대상인지 판단합니다. `Deleted`는 무시하고 age를 확정할 수 없는 `Modified`·`Renamed`는 재평가 대상으로 미룹니다.
+3. Local reader가 Workspace 탈출, rooted 경로와 reparse point를 거부하고 파일 종류·확장자·크기·version stamp를 수집합니다.
+4. 완전한 후보가 만들어졌을 때만 현재 정책 snapshot을 정확히 한 번 읽습니다.
+5. 정책이 있으면 항상 `Inspection` mode로 순수 evaluator를 호출합니다.
+6. 정책이 없거나 수집이 완료되지 않으면 구조화된 reason code를 보존하며 임의로 성공·제외로 바꾸지 않습니다.
+7. pipeline이 monitor 정보와 processor 결과를 integrated result로 결합하여 Desktop에 전달합니다. 개별 event의 예상하지 못한 예외는 `ProcessingFailed`로 변환하여 다음 event 처리와 stream 수명을 보호합니다.
 
-현재 processor는 개별 사건을 처리하는 Application use case까지 구현되어 있습니다. monitor stream에 실제로 연결하는 pipeline, 정책 변경 시 전체 재평가, 결과 UI, 영속 queue와 암호화는 아직 구현되지 않았습니다.
+runtime monitor stream과 Desktop 결과 전달은 현재 연결되어 있습니다. 다만 정책 load 이후 기존 후보의 자동 재평가, 파일 안정성 확인, 자동 retry, durable queue와 암호화는 아직 구현되지 않았습니다. local saturation은 reconciliation을 요청하지만 durable queue나 event별 재실행을 제공하지는 않습니다.
 
 ## 실패와 재평가 경계
 
@@ -116,4 +131,4 @@ flowchart LR
     Policy -->|"없음"| NotLoaded["policy.not-loaded<br/>향후 전체 재평가 필요"]
 ```
 
-`Eligible`은 향후 보호 작업 후보가 될 수 있다는 inspection 결과일 뿐 보호 완료가 아닙니다. 실제 집행 경계에서는 신뢰된 정책, 안정화된 파일 handle, 재수집한 metadata, 멱등적인 영속 작업과 비정상 종료 복구가 추가로 필요합니다.
+`Eligible`은 향후 보호 작업 후보가 될 수 있다는 inspection 결과일 뿐 보호 완료가 아닙니다. `Deferred`도 현재 자동 retry를 뜻하지 않습니다. 실제 집행 경계에서는 신뢰된 정책, 안정화된 파일 handle, 재수집한 metadata, durable queue, 멱등적인 영속 작업, 암호화와 비정상 종료 복구가 추가로 필요합니다.

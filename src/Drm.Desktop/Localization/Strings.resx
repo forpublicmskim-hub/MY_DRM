@@ -107,5 +107,44 @@
   <data name="Workspace.Validation.UnsupportedFileSystem" xml:space="preserve"><value>The storage device or file system is not supported.</value></data>
   <data name="Workspace.Storage.SaveFailed" xml:space="preserve"><value>The workspace settings could not be saved. Try again.</value></data>
   <data name="Workspace.Storage.Corrupted" xml:space="preserve"><value>The workspace settings are corrupted, so the folder cannot be registered.</value></data>
+  <data name="Inspection.Collection.Collected" xml:space="preserve"><value>Collected</value></data>
+  <data name="Inspection.Collection.Ignored" xml:space="preserve"><value>Ignored</value></data>
+  <data name="Inspection.Collection.Deferred" xml:space="preserve"><value>Deferred</value></data>
+  <data name="Inspection.Collection.Rejected" xml:space="preserve"><value>Rejected</value></data>
+  <data name="Inspection.Collection.NotAvailable" xml:space="preserve"><value>Not collected</value></data>
+  <data name="Inspection.Evaluation.Eligible" xml:space="preserve"><value>Protection candidate</value></data>
+  <data name="Inspection.Evaluation.Excluded" xml:space="preserve"><value>Policy excluded</value></data>
+  <data name="Inspection.Evaluation.Deferred" xml:space="preserve"><value>Evaluation deferred</value></data>
+  <data name="Inspection.Evaluation.PolicyInactive" xml:space="preserve"><value>Policy inactive</value></data>
+  <data name="Inspection.Evaluation.Indeterminate" xml:space="preserve"><value>Indeterminate</value></data>
+  <data name="Inspection.Evaluation.NotEvaluated" xml:space="preserve"><value>Not evaluated</value></data>
+  <data name="Inspection.Reason.Collected" xml:space="preserve"><value>Candidate metadata was collected.</value></data>
+  <data name="Inspection.Reason.Deleted" xml:space="preserve"><value>The deleted item is not evaluated.</value></data>
+  <data name="Inspection.Reason.UnsupportedObservation" xml:space="preserve"><value>This monitor event is not a file observation.</value></data>
+  <data name="Inspection.Reason.WorkspaceMismatch" xml:space="preserve"><value>The observation does not match the active workspace.</value></data>
+  <data name="Inspection.Reason.NotFound" xml:space="preserve"><value>The item no longer exists.</value></data>
+  <data name="Inspection.Reason.AccessDenied" xml:space="preserve"><value>File metadata could not be read due to access restrictions.</value></data>
+  <data name="Inspection.Reason.FileUnstable" xml:space="preserve"><value>The file must be inspected again after it becomes stable.</value></data>
+  <data name="Inspection.Reason.UnsafePath" xml:space="preserve"><value>The path is outside the workspace or is unsafe.</value></data>
+  <data name="Inspection.Reason.SymbolicLink" xml:space="preserve"><value>Symbolic links and reparse points are not inspected.</value></data>
+  <data name="Inspection.Reason.Unavailable" xml:space="preserve"><value>File metadata is temporarily unavailable.</value></data>
+  <data name="Inspection.Reason.AgeUnknown" xml:space="preserve"><value>The event does not establish whether the file is new or existing.</value></data>
+  <data name="Inspection.Reason.PolicyNotLoaded" xml:space="preserve"><value>No policy is loaded, so the candidate was not evaluated.</value></data>
+  <data name="Inspection.Reason.Eligible" xml:space="preserve"><value>The file matches the inspection policy. Protection has not been applied.</value></data>
+  <data name="Inspection.Reason.PolicyNotEnforceable" xml:space="preserve"><value>The inspection policy cannot be used for enforcement.</value></data>
+  <data name="Inspection.Reason.PolicyIdentityInvalid" xml:space="preserve"><value>The policy snapshot identity is invalid.</value></data>
+  <data name="Inspection.Reason.PolicyDisabled" xml:space="preserve"><value>The policy is disabled.</value></data>
+  <data name="Inspection.Reason.PolicyNotYetValid" xml:space="preserve"><value>The policy validity period has not started.</value></data>
+  <data name="Inspection.Reason.PolicyExpired" xml:space="preserve"><value>The policy has expired.</value></data>
+  <data name="Inspection.Reason.Directory" xml:space="preserve"><value>Directories are not file protection candidates.</value></data>
+  <data name="Inspection.Reason.AgeDisabled" xml:space="preserve"><value>The policy does not inspect this new or existing file category.</value></data>
+  <data name="Inspection.Reason.ExtensionExcluded" xml:space="preserve"><value>The file extension is explicitly excluded.</value></data>
+  <data name="Inspection.Reason.ExtensionNotIncluded" xml:space="preserve"><value>The file extension is not included by the policy.</value></data>
+  <data name="Inspection.Reason.FileTooLarge" xml:space="preserve"><value>The file exceeds the policy size limit.</value></data>
+  <data name="Inspection.Reason.MetadataUnavailable" xml:space="preserve"><value>Required file metadata is unavailable.</value></data>
+  <data name="Inspection.Reason.MetadataInvalid" xml:space="preserve"><value>The candidate metadata is invalid.</value></data>
+  <data name="Inspection.Reason.MonitorOnly" xml:space="preserve"><value>This event only updates monitor state.</value></data>
+  <data name="Inspection.Reason.WorkspaceUnavailable" xml:space="preserve"><value>The workspace is no longer active.</value></data>
+  <data name="Inspection.Reason.ProcessingFailed" xml:space="preserve"><value>The inspection failed unexpectedly. Monitoring continues.</value></data>
   <data name="Common.UnexpectedError" xml:space="preserve"><value>An unexpected error occurred.</value></data>
 </root>

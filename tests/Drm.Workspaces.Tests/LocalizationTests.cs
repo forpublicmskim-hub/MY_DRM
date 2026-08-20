@@ -57,6 +57,40 @@ public sealed partial class LocalizationTests
     }
 
     [Fact]
+    public void EveryCandidateStatusOutcomeAndReasonMapsToEverySupportedCulture()
+    {
+        Dictionary<string, string> neutral = LoadResource("Strings.resx");
+        Dictionary<string, string> korean = LoadResource("Strings.ko-KR.resx");
+
+        foreach (ProtectionCandidateCollectionStatus status in
+                 Enum.GetValues<ProtectionCandidateCollectionStatus>())
+            AssertResource(ProtectionCandidateMessageKeys.ForCollectionStatus(status));
+
+        foreach (ProtectionEvaluationOutcome outcome in Enum.GetValues<ProtectionEvaluationOutcome>())
+            AssertResource(ProtectionCandidateMessageKeys.ForEvaluationOutcome(outcome));
+
+        Type[] reasonTypes =
+        [
+            typeof(ProtectionCandidateCollectionReasonCodes),
+            typeof(ProtectionCandidateInspectionReasonCodes),
+            typeof(ProtectionCandidateReasonCodes),
+            typeof(ProtectionInspectionPipelineReasonCodes)
+        ];
+        foreach (string code in reasonTypes.SelectMany(type => type
+                     .GetFields(BindingFlags.Public | BindingFlags.Static)
+                     .Where(field => field.IsLiteral && !field.IsInitOnly && field.FieldType == typeof(string))
+                     .Select(field => (string)field.GetRawConstantValue()!))
+                 .Distinct(StringComparer.Ordinal))
+            AssertResource(ProtectionCandidateMessageKeys.ForReason(code));
+
+        void AssertResource(string key)
+        {
+            Assert.True(neutral.ContainsKey(key), $"Missing neutral resource: {key}");
+            Assert.True(korean.ContainsKey(key), $"Missing ko-KR resource: {key}");
+        }
+    }
+
+    [Fact]
     public void UnknownWorkspaceValidationCodeFallsBackToCommonErrorKey()
     {
         Assert.Equal("Common.UnexpectedError",

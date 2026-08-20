@@ -8,11 +8,11 @@ Desktop 애플리케이션은 등록된 Workspace의 기존 항목을 스캔하�
 
 ## 계층과 수명
 
-- `Drm.Application`: 감시 계약과 `WorkspaceMonitorManager`
+- `Drm.Application`: 감시 계약, `WorkspaceMonitorManager`, monitor 조정과 활성 Workspace snapshot 및 단일 소비를 소유하는 `ProtectionInspectionPipeline`
 - `Drm.Platform.Local`: `FileSystemWatcherWorkspaceMonitor`와 `LocalWorkspaceScanner`
-- `Drm.Desktop`: Registry 목록과 monitor 조정 및 최근 관찰 결과 관리
+- `Drm.Desktop`: Registry 목록을 pipeline을 통해 조정하고 통합 inspection 결과를 표시
 
-OS callback은 bounded channel에 빠르게 기록합니다. canonical Workspace 경계 밖 경로와 reparse point는 발행하지 않습니다. 등록 해제 시 해당 monitor를 중지하고 애플리케이션 종료 시 모든 monitor를 폐기합니다.
+OS callback은 bounded channel에 빠르게 기록합니다. 로컬 adapter의 정규화 channel이 포화되면 이벤트를 조용히 버리지 않고 monitor를 `Degraded`로 표시한 뒤 reconciliation을 요청합니다. manager와 pipeline의 bounded channel은 `DropOldest`로 기존 이벤트를 제거하지 않고 여유가 생길 때까지 기다립니다. canonical Workspace 경계 밖 경로와 reparse point는 발행하지 않습니다. 등록 해제 시 해당 monitor를 중지하고 애플리케이션 종료 시 모든 monitor를 폐기합니다.
 
 Desktop 창 종료는 첫 close 요청을 잠시 보류하고 비동기 정리를 시작합니다. 정리 중 UI dispatcher는 계속 실행되므로 이미 queue에 들어간 관찰 callback과 monitor 종료가 서로 기다리는 교착을 만들지 않습니다. 정리가 성공하거나 오류로 끝나면 두 번째 close 요청으로 실제 창을 닫으며, 중복 close 요청은 하나의 정리 task를 공유합니다.
 

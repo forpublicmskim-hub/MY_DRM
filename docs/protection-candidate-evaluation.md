@@ -5,14 +5,17 @@
 보호 후보 흐름은 파일을 변경하지 않는 inspection 전용 기반입니다.
 
     WorkspaceMonitorEvent
-      -> ProtectionCandidateInspectionProcessor
+      -> ProtectionInspectionPipeline
+         -> ProtectionCandidateInspectionProcessor
          -> ProtectionCandidateCollector
          -> IProtectionCandidateMetadataReader
          -> ICurrentProtectionPolicyProvider
          -> ProtectionCandidateEvaluator
-      -> ProtectionCandidateInspectionResult
+      -> Desktop integrated result
 
-현재 processor는 사건 하나를 처리하는 Application use case로만 구현되어 있습니다. runtime monitor stream에는 연결되지 않았으며 queue 등록·키 처리·암호화를 수행하지 않습니다.
+`ProtectionInspectionPipeline`은 `WorkspaceMonitorManager` stream의 유일한 consumer입니다. pipeline은 활성 Workspace snapshot을 소유하고 monitor event를 순서대로 `ProtectionCandidateInspectionProcessor`에 전달한 뒤, monitor 정보와 inspection 결과를 결합한 integrated result를 Desktop에 전달합니다. 개별 event에서 발생한 예상하지 못한 실패는 `ProcessingFailed` 결과로 격리하므로 이후 event 처리는 계속됩니다.
+
+manager와 pipeline의 channel은 기록된 출력을 조용히 폐기하지 않습니다. 로컬 channel이 포화되면 해당 출력을 버리는 대신 reconciliation을 요청하여 권위 있는 inventory를 다시 맞춥니다. 이 흐름은 inspection 전용이므로 queue 등록·키 처리·암호화를 수행하지 않습니다.
 
 ## inspection processor
 
@@ -25,7 +28,9 @@ ProtectionCandidateInspectionProcessor는 collection 결과가 Collected일 때�
 
 ProtectionCandidateInspectionResult는 별도 상태 enum을 중복 저장하지 않습니다. Decision 존재 여부로 평가 완료를 판단하고, 평가하지 않은 경우 SkipReasonCode에 collection reason 또는 policy.not-loaded를 보존합니다. factory는 Collected 후보와 Decision의 Workspace·상대 경로가 일치하도록 불변식을 검사합니다.
 
-정책이 나중에 로드돼도 policy.not-loaded 결과가 자동 재평가되지는 않습니다. 향후 정책 변경을 관찰하는 pipeline과 전체 Workspace 재평가 scan이 필요합니다.
+정책이 나중에 로드돼도 `policy.not-loaded` 결과가 자동 재평가되지는 않습니다. 현재 pipeline은 정책 load를 계기로 기존 파일의 전체 Workspace 재평가 scan을 시작하지 않습니다.
+
+현재 구현에는 파일 안정성 확인, 자동 retry, durable queue와 암호화가 없습니다. `Deferred`와 local saturation의 reconciliation 요청은 재검사가 필요하다는 사실을 보존하지만, 안정화 대기나 내구성 있는 작업 재실행을 제공하지는 않습니다.
 
 ## 후보 수집 경계
 

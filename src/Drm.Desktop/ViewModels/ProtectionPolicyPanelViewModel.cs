@@ -100,7 +100,6 @@ public sealed partial class ProtectionPolicyPanelViewModel(
             }
         }
         _lifetime.Dispose();
-        policies.Dispose();
     }
 }
 

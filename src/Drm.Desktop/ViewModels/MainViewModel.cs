@@ -12,15 +12,16 @@ namespace Drm.Desktop.ViewModels;
 
 public sealed partial class MainViewModel(
     WorkspaceService workspaces,
-    WorkspaceMonitorManager monitors,
+    ProtectionInspectionPipeline inspections,
     IFolderPicker folderPicker,
     IWorkspacePathLauncher pathLauncher,
     ILocalizationService localization,
-    ProtectionPolicyPanelViewModel policy) : ViewModelBase, IAsyncDisposable
+    ProtectionPolicyPanelViewModel policy,
+    ProtectionPolicyInspectionService policyService) : ViewModelBase, IAsyncDisposable
 {
     private const int RecentObservationLimit = 100;
     private readonly CancellationTokenSource _lifetime = new();
-    private Task? _monitorEventsTask;
+    private Task? _inspectionEventsTask;
 
     public ObservableCollection<WorkspaceItemViewModel> Items { get; } = [];
     public ObservableCollection<WorkspaceObservationItemViewModel> RecentObservations { get; } = [];
@@ -59,7 +60,7 @@ public sealed partial class MainViewModel(
     public async ValueTask InitializeAsync()
     {
         if (IsLoading) return;
-        _monitorEventsTask ??= ConsumeMonitorEventsAsync(_lifetime.Token);
+        _inspectionEventsTask ??= ConsumeInspectionEventsAsync(_lifetime.Token);
         IsLoading = true;
         OnPropertyChanged(nameof(ActivityMessage));
         ErrorMessage = null;
@@ -115,7 +116,7 @@ public sealed partial class MainViewModel(
             if (!removed) { ErrorMessage = localization.GetString("Workspace.Unregister.NotFound"); return; }
             Items.Remove(selected);
             SelectedItem = null;
-            await monitors.ReconcileAsync(Items.Select(item => item.Workspace).ToArray(), _lifetime.Token);
+            await inspections.ReconcileAsync(Items.Select(item => item.Workspace).ToArray(), _lifetime.Token);
         }
         catch (WorkspaceRegistryException) { ErrorMessage = localization.GetString("Workspace.Unregister.SaveFailed"); }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
@@ -138,27 +139,31 @@ public sealed partial class MainViewModel(
         Items.Clear();
         foreach (ProtectedWorkspace workspace in loaded.OrderBy(item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase))
             Items.Add(new WorkspaceItemViewModel(workspace, localization));
-        await monitors.ReconcileAsync(loaded, cancellationToken);
+        await inspections.ReconcileAsync(loaded, cancellationToken);
     }
 
-    private async Task ConsumeMonitorEventsAsync(CancellationToken cancellationToken)
+    private async Task ConsumeInspectionEventsAsync(CancellationToken cancellationToken)
     {
         try
         {
-            await foreach (WorkspaceMonitorEvent item in monitors.ObserveAsync(cancellationToken))
-                await Dispatcher.UIThread.InvokeAsync(() => ApplyMonitorEvent(item));
+            await foreach (ProtectionInspectionEvent item in inspections.ObserveAsync(cancellationToken))
+                await Dispatcher.UIThread.InvokeAsync(() => ApplyInspectionEvent(item));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
-    private void ApplyMonitorEvent(WorkspaceMonitorEvent item)
+    private void ApplyInspectionEvent(ProtectionInspectionEvent item)
     {
-        WorkspaceItemViewModel? workspace = Items.FirstOrDefault(candidate => candidate.Id == item.WorkspaceId);
-        if (workspace is not null) workspace.MonitorState = item.State;
-        if (item.Kind != WorkspaceMonitorEventKind.Observation || item.Observation is null) return;
+        WorkspaceMonitorEvent monitorEvent = item.MonitorEvent;
+        WorkspaceItemViewModel? workspace = Items.FirstOrDefault(candidate => candidate.Id == monitorEvent.WorkspaceId);
+        if (workspace is not null) workspace.MonitorState = monitorEvent.State;
+        if (monitorEvent.Kind != WorkspaceMonitorEventKind.Observation || monitorEvent.Observation is null) return;
 
         RecentObservations.Insert(0, new WorkspaceObservationItemViewModel(
-            workspace?.DisplayName ?? item.WorkspaceId.Value.ToString(), item.Observation, localization));
+            workspace?.DisplayName ?? monitorEvent.WorkspaceId.Value.ToString(),
+            monitorEvent.Observation,
+            item,
+            localization));
         while (RecentObservations.Count > RecentObservationLimit)
             RecentObservations.RemoveAt(RecentObservations.Count - 1);
     }
@@ -166,14 +171,15 @@ public sealed partial class MainViewModel(
     public async ValueTask DisposeAsync()
     {
         _lifetime.Cancel();
-        await monitors.DisposeAsync();
-        if (_monitorEventsTask is not null)
+        await inspections.DisposeAsync();
+        if (_inspectionEventsTask is not null)
         {
-            try { await _monitorEventsTask; }
+            try { await _inspectionEventsTask; }
             catch (OperationCanceledException) { }
         }
         _lifetime.Dispose();
         await Policy.DisposeAsync();
+        policyService.Dispose();
         workspaces.Dispose();
     }
 }
@@ -210,6 +216,7 @@ public sealed partial class WorkspaceItemViewModel(
 public sealed class WorkspaceObservationItemViewModel(
     string workspaceName,
     WorkspaceObservation observation,
+    ProtectionInspectionEvent inspectionEvent,
     ILocalizationService localization)
 {
     public string WorkspaceName { get; } = workspaceName;
@@ -224,4 +231,23 @@ public sealed class WorkspaceObservationItemViewModel(
         WorkspaceObservationKind.Renamed => localization.GetString("Workspace.Observation.Renamed"),
         _ => localization.GetString("Workspace.Observation.Unknown")
     };
+
+    public string CollectionStatus => inspectionEvent.Inspection is { } inspection
+        ? localization.GetString(ProtectionCandidateMessageKeys.ForCollectionStatus(inspection.Collection.Status))
+        : localization.GetString("Inspection.Collection.NotAvailable");
+
+    public string EvaluationStatus => inspectionEvent.Inspection?.Decision is { } decision
+        ? localization.GetString(ProtectionCandidateMessageKeys.ForEvaluationOutcome(decision.Outcome))
+        : localization.GetString("Inspection.Evaluation.NotEvaluated");
+
+    public string Reason
+    {
+        get
+        {
+            string? code = inspectionEvent.Inspection?.Decision?.ReasonCode
+                ?? inspectionEvent.Inspection?.SkipReasonCode
+                ?? inspectionEvent.ReasonCode;
+            return localization.GetString(ProtectionCandidateMessageKeys.ForReason(code));
+        }
+    }
 }

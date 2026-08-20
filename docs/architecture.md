@@ -101,18 +101,21 @@ flowchart TB
 ```mermaid
 flowchart LR
     Monitor["Workspace monitor"]
+    Pipeline["ProtectionInspectionPipeline<br/>Workspace snapshot 소유"]
     Processor["Candidate inspection processor"]
-    UI["Desktop 결과 UI"]
+    UI["Desktop 통합 inspection 결과"]
     Queue["영속 ProtectionJob queue"]
     Writer["원자적 보호 container writer"]
 
-    Monitor -. "아직 runtime 연결 안 됨" .-> Processor
-    Processor -. "아직 결과 화면 없음" .-> UI
+    Monitor -->|"manager의 유일한 consumer"| Pipeline
+    Pipeline -->|"이벤트별 순차 호출"| Processor
+    Processor --> Pipeline
+    Pipeline --> UI
     Processor -. "inspection만 가능" .-> Queue
     Queue -. "미구현" .-> Writer
 ```
 
-후보 collector·evaluator·processor는 테스트 가능한 Application 기반으로 구현되어 있지만 monitor stream의 실제 consumer로 아직 연결되지 않았습니다. 따라서 현재 Desktop의 `Watching`과 정책 inspection 성공은 파일 보호가 수행된다는 의미가 아닙니다.
+`ProtectionInspectionPipeline`은 manager의 monitor stream을 소비하는 유일한 consumer입니다. 이 pipeline은 등록된 Workspace의 활성 snapshot을 소유하고 각 관찰 이벤트에 대해 processor를 순차적으로 호출하며, Desktop은 pipeline을 통해 Workspace를 조정하고 통합 inspection 결과를 표시합니다. 이 연결은 inspection 전용이므로 Desktop의 `Watching`이나 inspection 성공은 파일 보호가 수행된다는 의미가 아닙니다.
 
 ## 보안 경계
 
@@ -127,12 +130,9 @@ flowchart LR
 
 ## 다음 구현 경계
 
-1. 정책 provider 수명을 UI에서 composition root로 이동
-2. 유일한 monitor consumer, bounded queue와 Workspace snapshot map을 갖는 inspection pipeline
-3. 정책 로드·교체 시 전체 Workspace 재평가 scan
-4. 선택한 Workspace와 정책의 `InspectionOnly` binding 및 결과 UI
-5. 파일 안정화, metadata 재수집과 정책 재평가
-6. 신뢰된 정책만 받는 영속 `ProtectionJob`
-7. 원자적 보호 container 작성과 비정상 종료 복구
+1. 정책 변경 시 전체 Workspace 재평가 scan
+2. 파일 안정화 확인, metadata 재수집과 재시도
+3. 신뢰된 정책만 받는 영속 `ProtectionJob` queue
+4. 신뢰된 집행 경계, 파일 암호화와 비정상 종료 복구
 
 세부 계약은 [Workspace 등록](workspace-registration.md), [Workspace 파일 감시](workspace-monitoring.md), [정책 소비 경계](policy-consumption.md), [보호 후보 수집과 평가](protection-candidate-evaluation.md)를 참조합니다.

@@ -71,7 +71,7 @@ public sealed class FileSystemWatcherWorkspaceMonitor : IWorkspaceMonitor
         {
             SingleReader = false,
             SingleWriter = true,
-            FullMode = BoundedChannelFullMode.DropOldest
+            FullMode = BoundedChannelFullMode.Wait
         });
     private readonly HashSet<string> _knownPaths = new(GetPathComparer());
     private CancellationTokenSource? _lifetime;
@@ -360,7 +360,11 @@ public sealed class FileSystemWatcherWorkspaceMonitor : IWorkspaceMonitor
 
     private void Publish(WorkspaceMonitorEvent item)
     {
-        _events.Writer.TryWrite(item);
+        if (_events.Writer.TryWrite(item)) return;
+
+        Interlocked.Exchange(ref _state, (int)WorkspaceMonitorState.Degraded);
+        Interlocked.Exchange(ref _reconciliationRequested, 1);
+        _rawEvents.Writer.TryWrite(RawFileSystemEvent.Reconcile);
     }
 
     private async ValueTask StopCoreAsync(CancellationToken cancellationToken)

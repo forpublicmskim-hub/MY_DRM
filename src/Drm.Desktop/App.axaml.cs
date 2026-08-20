@@ -42,13 +42,19 @@ public partial class App : Avalonia.Application
 #endif
             ProtectionPolicyLoader policyLoader = new(
                 new LocalFileProtectionPolicySource(), new SystemClock(), policyTrust);
+            ProtectionPolicyInspectionService policyService = new(policyLoader);
             ProtectionPolicyPanelViewModel policyPanel = new(
-                new ProtectionPolicyInspectionService(policyLoader),
+                policyService,
                 new AvaloniaPolicyFilePicker(() => window, localization),
                 localization);
-            window.DataContext = new MainViewModel(workspaceService, monitors,
+            ProtectionCandidateInspectionProcessor processor = new(
+                new ProtectionCandidateCollector(new LocalProtectionCandidateMetadataReader()),
+                policyService,
+                new SystemClock());
+            ProtectionInspectionPipeline inspectionPipeline = new(monitors, processor);
+            window.DataContext = new MainViewModel(workspaceService, inspectionPipeline,
                 new AvaloniaFolderPicker(() => window, localization), new LocalWorkspacePathLauncher(),
-                localization, policyPanel);
+                localization, policyPanel, policyService);
             desktop.MainWindow = window;
         }
 

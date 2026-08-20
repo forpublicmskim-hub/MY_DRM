@@ -97,7 +97,8 @@ Policy Maker가 만드는 결과는 `Draft` 상태의 unsigned development polic
 - DRM Desktop에서 Policy Maker가 만든 로컬 JSON을 선택해 크기·UTF-8·JSON·schema·capability·정책 값을 다시 검증할 수 있습니다.
 - 검증에 성공한 문서는 불변 EffectiveProtectionPolicy snapshot으로 compile하고 정책 ID, version, 확장자, 최대 크기와 출처를 읽기 전용으로 표시합니다.
 - Debug 빌드에서만 unsigned development Draft를 표시용으로 허용합니다. Release 빌드는 동일 문서를 Untrusted로 거부합니다.
-- 정책 문서 검증, 신뢰 상태와 집행 상태를 구분하며, 불러온 정책은 작업공간·파일 감시·암호화에 적용하지 않습니다.
+- 정상적으로 불러온 inspection 정책은 작업공간에서 관찰한 `Existing`과 `Created` 항목을 평가하는 데만 사용합니다. 최근 관찰 UI에는 수집 상태, 평가 결과와 현지화된 사유를 표시합니다.
+- 이 평가는 파일을 변경하거나 암호화하지 않으며, `Eligible`은 보호가 적용되었다는 의미가 아니라 보호 후보라는 의미만 나타냅니다.
 - 정책 파일은 하나의 열린 stream에서 최대 1 MiB + 1 byte까지만 읽으며, 실패한 로드는 직전의 정상 snapshot을 교체하지 않습니다.
 
 ## 요구 사항
@@ -140,7 +141,8 @@ dotnet run --project src/Drm.PolicyMaker/Drm.PolicyMaker.csproj
 - 작업공간은 이미 존재하며 읽기·쓰기가 가능한 로컬 고정 디스크의 일반 디렉터리만 지원합니다.
 - 단일 사용자와 단일 관리 프로세스를 전제로 하며 다중 프로세스 Registry 동시 쓰기는 지원하지 않습니다.
 - canonical path는 중복과 중첩 판정에 사용하지만 영구 파일 시스템 식별자가 아니므로, 폴더 이동이나 검증 직후 위치 교체를 완전히 방어하지 못합니다.
-- Desktop UI는 작업공간 등록 상태만 관리하며 실제 암호화나 접근 통제를 활성화하지 않습니다.
+- 이전 관찰 이후에 정책을 불러와도 기존 파일을 자동으로 다시 평가하지 않습니다. `Modified`와 `Renamed`는 파일 나이를 알 수 없어 `Deferred`로 유지되며, `Created` metadata는 파일 안정성을 보장하지 않는 순간 snapshot입니다.
+- 재시도, durable queue, 암호화와 접근 통제는 제공하지 않습니다.
 - `Drm.Host`는 향후 서비스 composition root를 위한 자리이며 아직 보호 콘텐츠 재생이나 서비스 IPC를 제공하지 않습니다.
 
 ## 프로젝트 구성

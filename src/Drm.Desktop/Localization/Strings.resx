@@ -75,6 +75,13 @@
   <data name="Workspace.Unregister.SaveFailed" xml:space="preserve"><value>The unregister operation could not be saved. The folder and its files were not changed.</value></data>
   <data name="Workspace.Open.Failed" xml:space="preserve"><value>The registered folder could not be opened.</value></data>
   <data name="Workspace.Monitor.RecentObservations" xml:space="preserve"><value>Recent file observations</value></data>
+  <data name="Workspace.Observation.Column.Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Workspace.Observation.Column.Kind" xml:space="preserve"><value>Event</value></data>
+  <data name="Workspace.Observation.Column.Path" xml:space="preserve"><value>Path</value></data>
+  <data name="Workspace.Observation.Column.Collection" xml:space="preserve"><value>Collection</value></data>
+  <data name="Workspace.Observation.Column.Evaluation" xml:space="preserve"><value>Evaluation</value></data>
+  <data name="Workspace.Observation.Column.Reason" xml:space="preserve"><value>Reason</value></data>
+  <data name="Workspace.Observation.Column.Workspace" xml:space="preserve"><value>Workspace</value></data>
   <data name="Workspace.Monitor.State.Starting" xml:space="preserve"><value>Starting monitor</value></data>
   <data name="Workspace.Monitor.State.Watching" xml:space="preserve"><value>Monitoring</value></data>
   <data name="Workspace.Monitor.State.Rescanning" xml:space="preserve"><value>Rescanning</value></data>

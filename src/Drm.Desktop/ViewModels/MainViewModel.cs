@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -33,6 +34,13 @@ public sealed partial class MainViewModel(
     public string UnregisterLabel => localization.GetString("Workspace.Unregister");
     public string OpenLocationLabel => localization.GetString("Workspace.OpenLocation");
     public string RecentObservationsTitle => localization.GetString("Workspace.Monitor.RecentObservations");
+    public string ObservationTimeLabel => localization.GetString("Workspace.Observation.Column.Time");
+    public string ObservationKindLabel => localization.GetString("Workspace.Observation.Column.Kind");
+    public string ObservationPathLabel => localization.GetString("Workspace.Observation.Column.Path");
+    public string ObservationCollectionLabel => localization.GetString("Workspace.Observation.Column.Collection");
+    public string ObservationEvaluationLabel => localization.GetString("Workspace.Observation.Column.Evaluation");
+    public string ObservationReasonLabel => localization.GetString("Workspace.Observation.Column.Reason");
+    public string ObservationWorkspaceLabel => localization.GetString("Workspace.Observation.Column.Workspace");
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UnregisterCommand), nameof(OpenPathCommand))]
@@ -221,7 +229,8 @@ public sealed class WorkspaceObservationItemViewModel(
 {
     public string WorkspaceName { get; } = workspaceName;
     public string Path { get; } = observation.RelativePath;
-    public string ObservedAt => observation.ObservedAt.ToLocalTime().TimeOfDay.ToString();
+    public string ObservedAt => observation.ObservedAt.ToLocalTime()
+        .ToString("HH:mm:ss.fff", CultureInfo.CurrentCulture);
     public string Kind => observation.Kind switch
     {
         WorkspaceObservationKind.Existing => localization.GetString("Workspace.Observation.Existing"),

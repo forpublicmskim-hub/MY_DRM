@@ -75,6 +75,13 @@
   <data name="Workspace.Unregister.SaveFailed" xml:space="preserve"><value>등록 해제 내용을 저장하지 못했습니다. 폴더와 파일은 변경되지 않았습니다.</value></data>
   <data name="Workspace.Open.Failed" xml:space="preserve"><value>등록된 폴더를 열 수 없습니다.</value></data>
   <data name="Workspace.Monitor.RecentObservations" xml:space="preserve"><value>최근 파일 관찰</value></data>
+  <data name="Workspace.Observation.Column.Time" xml:space="preserve"><value>관찰 시각</value></data>
+  <data name="Workspace.Observation.Column.Kind" xml:space="preserve"><value>이벤트</value></data>
+  <data name="Workspace.Observation.Column.Path" xml:space="preserve"><value>경로</value></data>
+  <data name="Workspace.Observation.Column.Collection" xml:space="preserve"><value>수집 상태</value></data>
+  <data name="Workspace.Observation.Column.Evaluation" xml:space="preserve"><value>평가 상태</value></data>
+  <data name="Workspace.Observation.Column.Reason" xml:space="preserve"><value>판정 사유</value></data>
+  <data name="Workspace.Observation.Column.Workspace" xml:space="preserve"><value>작업공간</value></data>
   <data name="Workspace.Monitor.State.Starting" xml:space="preserve"><value>감시 시작 중</value></data>
   <data name="Workspace.Monitor.State.Watching" xml:space="preserve"><value>감시 중</value></data>
   <data name="Workspace.Monitor.State.Rescanning" xml:space="preserve"><value>다시 확인 중</value></data>

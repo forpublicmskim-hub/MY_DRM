@@ -6,14 +6,15 @@
         Width="1180" Height="700" MinWidth="900" MinHeight="560"
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding AppTitle}">
-  <Grid ColumnDefinitions="2*,*" RowDefinitions="Auto,*,140,Auto,Auto" Margin="28" RowSpacing="16" ColumnSpacing="18">
+  <Grid ColumnDefinitions="2*,*" RowDefinitions="Auto,*,Auto,Auto" Margin="28" RowSpacing="16" ColumnSpacing="18">
     <StackPanel Grid.Row="0" Spacing="6">
       <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding WorkspaceTitle}" />
       <TextBlock Foreground="{DynamicResource AppTextSecondaryBrush}"
                  Text="{Binding WorkspaceDescription}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8">
+    <Grid Grid.Row="1" RowDefinitions="*,8,140">
+    <Border Grid.Row="0" MinHeight="120" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8">
       <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:WorkspaceItemViewModel">
@@ -33,28 +34,53 @@
       </ListBox>
     </Border>
 
-    <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="6">
+    <GridSplitter Grid.Row="1" Height="8" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                  Background="{DynamicResource AppBorderBrush}" Cursor="SizeNorthSouth"
+                  ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" />
+
+    <Grid Grid.Row="2" MinHeight="100" RowDefinitions="Auto,*" RowSpacing="6">
       <TextBlock FontWeight="SemiBold" Text="{Binding RecentObservationsTitle}" />
-      <Border Grid.Row="1" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
-        <ListBox ItemsSource="{Binding RecentObservations}">
-          <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="vm:WorkspaceObservationItemViewModel">
-              <Grid ColumnDefinitions="80,90,2*,110,110,2*,Auto" ColumnSpacing="8" Margin="6,3">
-                <TextBlock Grid.Column="0" Text="{Binding ObservedAt}" />
-                <TextBlock Grid.Column="1" Text="{Binding Kind}" />
-                <TextBlock Grid.Column="2" Text="{Binding Path}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Grid.Column="3" Text="{Binding CollectionStatus}" />
-                <TextBlock Grid.Column="4" Text="{Binding EvaluationStatus}" />
-                <TextBlock Grid.Column="5" Text="{Binding Reason}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Grid.Column="6" Text="{Binding WorkspaceName}" Foreground="{DynamicResource AppTextSecondaryBrush}" />
+      <Border Grid.Row="1" Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+          <Grid MinWidth="1180" RowDefinitions="Auto,*">
+            <Border Background="{DynamicResource AppSurfaceElevatedBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="0,0,0,1" Padding="12,7">
+              <Grid ColumnDefinitions="105,100,260,110,120,300,185" ColumnSpacing="12">
+                <TextBlock Grid.Column="0" FontWeight="SemiBold" Text="{Binding ObservationTimeLabel}" />
+                <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding ObservationKindLabel}" />
+                <TextBlock Grid.Column="2" FontWeight="SemiBold" Text="{Binding ObservationPathLabel}" />
+                <TextBlock Grid.Column="3" FontWeight="SemiBold" Text="{Binding ObservationCollectionLabel}" />
+                <TextBlock Grid.Column="4" FontWeight="SemiBold" Text="{Binding ObservationEvaluationLabel}" />
+                <TextBlock Grid.Column="5" FontWeight="SemiBold" Text="{Binding ObservationReasonLabel}" />
+                <TextBlock Grid.Column="6" FontWeight="SemiBold" Text="{Binding ObservationWorkspaceLabel}" />
               </Grid>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
+            </Border>
+            <ListBox Grid.Row="1" ItemsSource="{Binding RecentObservations}" BorderThickness="0">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:WorkspaceObservationItemViewModel">
+                  <Border BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="0,0,0,1" Padding="12,6">
+                    <Grid ColumnDefinitions="105,100,260,110,120,300,185" ColumnSpacing="12">
+                      <TextBlock Grid.Column="0" Text="{Binding ObservedAt}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Kind}" />
+                      <TextBlock Grid.Column="2" Text="{Binding Path}" TextTrimming="CharacterEllipsis"
+                                 ToolTip.Tip="{Binding Path}" />
+                      <TextBlock Grid.Column="3" Text="{Binding CollectionStatus}" />
+                      <TextBlock Grid.Column="4" Text="{Binding EvaluationStatus}" />
+                      <TextBlock Grid.Column="5" Text="{Binding Reason}" TextTrimming="CharacterEllipsis"
+                                 ToolTip.Tip="{Binding Reason}" />
+                      <TextBlock Grid.Column="6" Text="{Binding WorkspaceName}" TextTrimming="CharacterEllipsis"
+                                 ToolTip.Tip="{Binding WorkspaceName}" Foreground="{DynamicResource AppTextSecondaryBrush}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+        </ScrollViewer>
       </Border>
     </Grid>
+    </Grid>
 
-    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
+    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
             Background="{DynamicResource AppSurfaceBrush}" BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
       <ScrollViewer>
         <StackPanel Spacing="10">
@@ -107,14 +133,14 @@
       </ScrollViewer>
     </Border>
 
-    <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10">
+    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="10">
       <Button Command="{Binding AddFolderCommand}" Content="{Binding AddFolderLabel}" />
       <Button Command="{Binding UnregisterCommand}" Content="{Binding UnregisterLabel}" />
       <Button Command="{Binding OpenPathCommand}" Content="{Binding OpenLocationLabel}" />
       <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding ActivityMessage}" />
     </StackPanel>
 
-    <Border Grid.Row="4" Grid.ColumnSpan="2" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+    <Border Grid.Row="3" Grid.ColumnSpan="2" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
             Background="{DynamicResource AppDangerSurfaceBrush}" BorderBrush="{DynamicResource AppDangerBrush}"
             BorderThickness="1" CornerRadius="6" Padding="12">
       <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />

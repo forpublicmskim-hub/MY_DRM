@@ -16,6 +16,8 @@ OS callback은 bounded channel에 빠르게 기록합니다. 로컬 adapter의 �
 
 Desktop 창 종료는 첫 close 요청을 잠시 보류하고 비동기 정리를 시작합니다. 정리 중 UI dispatcher는 계속 실행되므로 이미 queue에 들어간 관찰 callback과 monitor 종료가 서로 기다리는 교착을 만들지 않습니다. 정리가 성공하거나 오류로 끝나면 두 번째 close 요청으로 실제 창을 닫으며, 중복 close 요청은 하나의 정리 task를 공유합니다.
 
+Desktop에서는 보호 작업공간 목록과 최근 파일 관찰 표 사이의 경계를 위아래로 드래그하여 각 영역의 높이를 조절할 수 있습니다. 두 영역에는 최소 높이가 적용되므로 사용자가 한 영역을 완전히 숨길 수는 없습니다.
+
 감시 상태와 관찰 종류는 Application enum으로 전달하고 Desktop에서 `ILocalizationService`를 통해 표시합니다. 영어 중립 리소스와 `ko-KR` 리소스는 동일한 감시 키 계약을 제공하며, Application과 Platform 계층에는 사용자 문구를 두지 않습니다.
 
 ## 현재 제한 사항

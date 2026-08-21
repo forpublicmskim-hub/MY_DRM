@@ -97,7 +97,7 @@ Policy Maker가 만드는 결과는 `Draft` 상태의 unsigned development polic
 - DRM Desktop에서 Policy Maker가 만든 로컬 JSON을 선택해 크기·UTF-8·JSON·schema·capability·정책 값을 다시 검증할 수 있습니다.
 - 검증에 성공한 문서는 불변 EffectiveProtectionPolicy snapshot으로 compile하고 정책 ID, version, 확장자, 최대 크기와 출처를 읽기 전용으로 표시합니다.
 - Debug 빌드에서만 unsigned development Draft를 표시용으로 허용합니다. Release 빌드는 동일 문서를 Untrusted로 거부합니다.
-- 정상적으로 불러온 inspection 정책은 작업공간에서 관찰한 `Existing`과 `Created` 항목을 평가하는 데만 사용합니다. 최근 관찰 UI에는 수집 상태, 평가 결과와 현지화된 사유를 표시합니다.
+- 정상적으로 불러온 inspection 정책은 작업공간에서 관찰한 `Existing`과 `Created` 항목을 평가하는 데만 사용합니다. 최근 관찰 UI에는 수집 상태, 평가 결과와 현지화된 사유를 표시합니다. 보호 작업공간 목록과 최근 파일 관찰 표 사이의 경계를 위아래로 드래그하여 두 영역의 높이를 조절할 수 있습니다.
 - 이 평가는 파일을 변경하거나 암호화하지 않으며, `Eligible`은 보호가 적용되었다는 의미가 아니라 보호 후보라는 의미만 나타냅니다.
 - 정책 파일은 하나의 열린 stream에서 최대 1 MiB + 1 byte까지만 읽으며, 실패한 로드는 직전의 정상 snapshot을 교체하지 않습니다.
 
